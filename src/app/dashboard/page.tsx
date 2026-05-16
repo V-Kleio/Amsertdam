@@ -76,7 +76,7 @@ export default function Dashboard() {
           tasks.forEach((task: any) => { counts[task.priority ?? 'If You Have Energy'] = (counts[task.priority ?? 'If You Have Energy'] || 0) + 1 })
           setTaskItems((prev) => prev.map((p) => ({ ...p, taskCount: counts[p.type as keyof typeof counts] || 0 })))
         }
-      } catch {}
+      } catch { }
 
       try {
         const c = await fetch('/api/courses')
@@ -84,7 +84,7 @@ export default function Dashboard() {
           const courses = await c.json()
           setCourseItems(courses.map((co: any) => ({ courseName: co.title, credits: 3, fromTime: 8, toTime: 10, typeTracking: 'On Track', threshold: '—' })))
         }
-      } catch {}
+      } catch { }
 
       try {
         const f = await fetch('/api/flashcards')
@@ -92,7 +92,7 @@ export default function Dashboard() {
           const decks = await f.json()
           setFlashcardCount(Array.isArray(decks) ? decks.length : 0)
         }
-      } catch {}
+      } catch { }
     })()
   }, [])
 
@@ -146,12 +146,12 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-row justify-between gap-23 px-14.75 py-11.5">
+    <div className="flex flex-col gap-10 px-4 py-6 md:flex-row md:justify-between md:gap-23 md:px-10 lg:px-14.75 md:py-11.5">
       {/* Overviews */}
-      <div className="flex flex-col gap-10 w-168.75">
+      <div className="flex w-full flex-col gap-8 md:gap-10 md:w-168.75">
         {/* Greetings */}
         <div className="flex flex-col gap-3">
-          <h1 className="text-[28px] font-semibold text-black-primary">
+          <h1 className="text-[24px] font-semibold text-black-primary sm:text-[28px]">
             Hello, {user?.user_metadata?.full_name?.split(" ")[0] ?? user?.email?.split("@")[0] ?? "there"}!
           </h1>
           <p className="text-gray-primary">
@@ -162,8 +162,8 @@ export default function Dashboard() {
 
         {/* Tasks Overview */}
         <div>
-          <div className="flex flex-row justify-between items-center mb-5">
-            <h1 className="text-[20px] font-semibold text-black-primary">
+          <div className="flex flex-row justify-between items-center mb-4 sm:mb-5">
+            <h1 className="text-[18px] font-semibold text-black-primary sm:text-[20px]">
               Tasks Overview
             </h1>
             <a
@@ -173,11 +173,11 @@ export default function Dashboard() {
               See Tasks
             </a>
           </div>
-          <div className="flex flex-row gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {taskItems.map((item, index) => (
               <div
                 key={index}
-                className="flex-col gap-2.5 pt-4 rounded-lg w-1/3"
+                className="flex flex-col gap-2.5 pt-4 rounded-lg"
                 style={{
                   background: item.cardColor,
                 }}
@@ -189,13 +189,13 @@ export default function Dashboard() {
                   {item.icon}
                 </div>
 
-                <div className="flex flex-row gap-1">
+                <div className="flex flex-row gap-2 px-3 pb-4">
                   <Image
                     src={item.image}
                     alt={`${item.type} Tasks Graph`}
                     width={105}
                     height={87}
-                    className="w-auto h-auto"
+                    className="h-auto w-20 sm:w-[105px]"
                   />
                   <div>
                     <h1 className="text-sm">
@@ -216,9 +216,9 @@ export default function Dashboard() {
         </div>
 
         {/* Courses Overview */}
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6 sm:gap-8">
           <div className="flex flex-row justify-between items-center">
-            <h1 className="text-[20px] font-semibold text-black-primary">
+            <h1 className="text-[18px] font-semibold text-black-primary sm:text-[20px]">
               Courses Overview
             </h1>
             <a
@@ -233,10 +233,10 @@ export default function Dashboard() {
             {courseItems.map((item, index) => (
               <div
                 key={index}
-                className="flex flex-row justify-between items-center bg-white p-4 rounded-lg shadow-md"
+                className="flex flex-col gap-3 bg-white p-4 rounded-lg shadow-md sm:flex-row sm:justify-between sm:items-center"
               >
                 <div className="flex flex-col gap-1">
-                  <div className="flex flex-row gap-3 items-center text-black-primary font-medium">
+                  <div className="flex flex-wrap gap-2 items-center text-black-primary font-medium">
                     <h1>{item.courseName}</h1>
                     <div
                       className="py-1 px-3 text-xs font-semibold"
@@ -262,9 +262,9 @@ export default function Dashboard() {
                   </p>
                 </div>
 
-                <div>
+                <div className="sm:text-right">
                   <p className="text-xs text-gray-primary">Pass Threshold</p>
-                  <p className="text-right text-2xl font-medium">
+                  <p className="text-2xl font-medium">
                     {item.threshold}
                   </p>
                 </div>
@@ -275,10 +275,10 @@ export default function Dashboard() {
       </div>
 
       {/* Calendar */}
-      <div className="max-w-md bg-white w-1/2">
+      <div className="w-full max-w-full bg-white md:w-1/2 md:max-w-md">
         {/* Header Section */}
-        <div className="flex flex-col gap-3 mb-10">
-          <h1 className="text-2xl font-semibold text-gray-800">
+        <div className="flex flex-col gap-3 mb-8 sm:mb-10">
+          <h1 className="text-xl font-semibold text-gray-800 sm:text-2xl">
             Want to memorize better?
           </h1>
           <a
@@ -291,7 +291,7 @@ export default function Dashboard() {
 
         {/* Priority Planner Section */}
         <div className="flex flex-row justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
             Priority Planner
           </h2>
           <a
@@ -303,8 +303,8 @@ export default function Dashboard() {
         </div>
 
         {/* Month Navigation */}
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-lg font-medium text-gray-900">{monthName}</h3>
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
+          <h3 className="text-base font-medium text-gray-900 sm:text-lg">{monthName}</h3>
           <div className="flex gap-2">
             <button
               onClick={previousMonth}
@@ -350,11 +350,11 @@ export default function Dashboard() {
         {/* Calendar Grid */}
         <div className="mb-8">
           {/* Day headers */}
-          <div className="grid grid-cols-7 gap-9 mb-2">
+          <div className="grid grid-cols-7 gap-2 sm:gap-6 lg:gap-9 mb-2">
             {daysOfWeek.map((day) => (
               <div
                 key={day}
-                className="text-center text-sm font-medium text-gray-600 py-2"
+                className="text-center text-xs font-medium text-gray-600 py-2 sm:text-sm"
               >
                 {day}
               </div>
@@ -362,7 +362,7 @@ export default function Dashboard() {
           </div>
 
           {/* Calendar days */}
-          <div className="grid grid-cols-7 gap-9">
+          <div className="grid grid-cols-7 gap-2 sm:gap-6 lg:gap-9">
             {calendarDays.map((day, index) => (
               <div
                 key={index}
@@ -371,11 +371,10 @@ export default function Dashboard() {
                 {day && (
                   <button
                     onClick={() => setSelectedDay(day)}
-                    className={`w-full h-full flex items-center justify-center rounded-full text-sm font-medium transition-colors ${
-                      day === selectedDay
+                    className={`w-full h-full flex items-center justify-center rounded-full text-xs font-medium transition-colors sm:text-sm ${day === selectedDay
                         ? "bg-indigo-600 text-white"
                         : "text-gray-900 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     {day}
                   </button>
