@@ -14,9 +14,22 @@ type MenuItem = {
   icon: React.ReactNode;
 };
 
-export default function Sidebar({ className }: { className?: string }) {
+export default function Sidebar({
+  className,
+  isOpen: isOpenProp,
+  onToggle,
+  onClose,
+}: {
+  className?: string;
+  isOpen?: boolean;
+  onToggle?: () => void;
+  onClose?: () => void;
+}) {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(true);
+  const [internalOpen, setInternalOpen] = useState(true);
+  const isOpen = isOpenProp ?? internalOpen;
+  const handleToggle = onToggle ?? (() => setInternalOpen((prev) => !prev));
+  const handleClose = onClose ?? (() => setInternalOpen(false));
 
   const menuItems: MenuItem[] = [
     {
@@ -58,9 +71,8 @@ export default function Sidebar({ className }: { className?: string }) {
 
   return (
     <aside
-      className={`${
-        isOpen ? "w-64" : "w-16"
-      } min-h-screen bg-[#3d42e50d] text-white flex flex-col justify-between pl-4 py-6 shrink-0 transition-all duration-300 ${className}`}
+      className={`fixed inset-y-0 left-0 z-50 min-h-screen bg-white flex flex-col justify-between pl-4 py-6 shadow-2xl shrink-0 transition-all duration-300 md:static md:translate-x-0 md:min-h-screen md:bg-[#3d42e50d] md:shadow-none ${isOpen ? "translate-x-0" : "-translate-x-full"
+        } ${isOpen ? "md:w-64" : "md:w-16"} w-64 overflow-hidden ${className}`}
     >
       {/* TOP */}
       <div>
@@ -68,7 +80,7 @@ export default function Sidebar({ className }: { className?: string }) {
         <div className="flex items-center justify-between mb-10 px-2">
           <button
             className="cursor-pointer rounded"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={handleToggle}
           >
             <HamburgerIcon size={20} className="stroke-black-primary" />
           </button>
@@ -84,12 +96,16 @@ export default function Sidebar({ className }: { className?: string }) {
                 key={item.label}
                 href={item.href}
                 className={`relative flex items-center gap-3 px-2 py-3 rounded-md transition font-inter
-                  ${
-                    isActive
-                      ? "text-indigo-primary stroke-indigo-primary"
-                      : "text-black-primary stroke-black-primary hover:text-indigo-primary hover:stroke-indigo-primary"
+                  ${isActive
+                    ? "text-indigo-primary stroke-indigo-primary"
+                    : "text-black-primary stroke-black-primary hover:text-indigo-primary hover:stroke-indigo-primary"
                   }
                 `}
+                onClick={() => {
+                  if (typeof window !== "undefined" && window.innerWidth < 768) {
+                    handleClose();
+                  }
+                }}
               >
                 {item.icon}
                 {isOpen && (
@@ -113,10 +129,10 @@ export default function Sidebar({ className }: { className?: string }) {
             try {
               const supabase = createClient();
               await supabase.auth.signOut();
-            } catch {}
+            } catch { }
             try {
               localStorage.removeItem("realtrack-storage");
-            } catch {}
+            } catch { }
             window.location.href = "/sign-in";
           }}
         >
