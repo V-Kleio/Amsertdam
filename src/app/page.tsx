@@ -12,8 +12,8 @@ import {
 export default function LandingPage() {
   return (
     <div className="bg-white min-h-screen overflow-x-hidden">
-      <header className="pt-8 px-4">
-        <div className="mx-auto flex w-full max-w-[1240px] items-center justify-between rounded-full bg-indigo-primary/5 px-6 py-2">
+      <header className="pt-6 px-4 md:pt-8">
+        <div className="mx-auto flex w-full max-w-[1240px] flex-col items-center justify-between gap-4 rounded-3xl bg-indigo-primary/5 px-4 py-3 sm:flex-row sm:rounded-full sm:px-6">
           <Link href="/" className="block">
             <Image
               src="/logo.svg"
@@ -21,9 +21,10 @@ export default function LandingPage() {
               width={151}
               height={53}
               priority
+              className="h-auto w-[130px] sm:w-[151px]"
             />
           </Link>
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-3 sm:gap-8">
             <Link
               href="/sign-in"
               className="text-sm font-medium text-indigo-primary hover:opacity-80"
@@ -32,7 +33,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/sign-up"
-              className="rounded-full bg-indigo-primary px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+              className="rounded-full bg-indigo-primary px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 sm:px-5 sm:py-2.5"
             >
               Sign Up
             </Link>
@@ -40,13 +41,13 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <section className="px-4 pt-32 pb-24">
-        <div className="mx-auto flex w-full max-w-[1024px] flex-col items-center gap-13 text-center">
+      <section className="px-4 pt-20 pb-16 md:pt-32 md:pb-24">
+        <div className="mx-auto flex w-full max-w-[1024px] flex-col items-center gap-10 text-center md:gap-13">
           <div className="flex flex-col gap-5">
-            <h1 className="text-[48px] font-semibold leading-tight text-black">
+            <h1 className="text-[36px] font-semibold leading-tight text-black sm:text-[44px] lg:text-[48px]">
               Feeling overwhelmed by assignments, deadlines, and exams?
             </h1>
-            <p className="text-[20px] leading-[30px] text-gray-primary">
+            <p className="text-base leading-7 text-gray-primary sm:text-[20px] sm:leading-[30px]">
               RealTrack helps you understand what really matters in your
               studies, so you can focus your energy, manage your workload, and
               stay on track toward graduation.
@@ -54,7 +55,7 @@ export default function LandingPage() {
           </div>
           <Link
             href="/sign-up"
-            className="inline-flex items-center gap-2.5 rounded-full bg-indigo-primary px-6 py-3 text-base font-medium text-white transition hover:opacity-90"
+            className="inline-flex items-center gap-2.5 rounded-full bg-indigo-primary px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 sm:text-base"
           >
             Sign Up for Free
             <ArrowRight size={20} />
@@ -62,9 +63,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-indigo-primary/5 px-4 py-20">
-        <div className="mx-auto flex w-full max-w-[980px] flex-col items-center gap-20">
-          <h2 className="text-center text-[28px] font-medium text-black-primary">
+      <section className="bg-indigo-primary/5 px-4 py-16 sm:py-20">
+        <div className="mx-auto flex w-full max-w-[980px] flex-col items-center gap-12 sm:gap-20">
+          <h2 className="text-center text-[22px] font-medium text-black-primary sm:text-[28px]">
             Everything to help you learn better, one step at a time
           </h2>
 
@@ -139,9 +140,7 @@ function FeatureCard({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className={`${color} relative h-[351px] w-full overflow-hidden rounded-2xl`}
-    >
+    <div className={`${color} relative h-[320px] w-full overflow-hidden rounded-2xl sm:h-[351px]`}>
       <div className="flex flex-col items-center gap-2 px-5 pt-6 pb-2 text-center text-white">
         <h3 className="text-xl font-semibold">{title}</h3>
         <p className="text-xs leading-snug">{description}</p>
@@ -160,7 +159,7 @@ function PassingTargetPreview() {
   ];
 
   return (
-    <div className="absolute right-0 bottom-0 w-[256px] rounded-tl-xl rounded-br-2xl bg-white p-3 shadow-lg">
+    <div className="absolute right-0 bottom-0 w-[220px] rounded-tl-xl rounded-br-2xl bg-white p-2 shadow-lg sm:w-[256px] sm:p-3">
       <div className="flex flex-col gap-2">
         {courses.map((c) => (
           <div
@@ -176,11 +175,10 @@ function PassingTargetPreview() {
               </p>
             </div>
             <span
-              className={`shrink-0 rounded-full px-2 py-0.5 text-[8px] font-semibold ${
-                c.status === "On Track"
+              className={`shrink-0 rounded-full px-2 py-0.5 text-[8px] font-semibold ${c.status === "On Track"
                   ? "bg-green-100 text-green-700"
                   : "bg-yellow-100 text-yellow-700"
-              }`}
+                }`}
             >
               {c.status}
             </span>
@@ -194,9 +192,9 @@ function PassingTargetPreview() {
 function TaskValuePreview() {
   return (
     <div className="relative h-full w-full">
-      <div className="absolute left-1/2 top-[18px] h-[118px] w-[211px] -translate-x-1/2 -rotate-[5deg] rounded-lg bg-white/95" />
-      <div className="absolute left-1/2 top-[10px] h-[131px] w-[226px] -translate-x-1/2 rotate-[3deg] rounded-lg bg-white/95" />
-      <div className="absolute left-1/2 top-[20px] flex h-[124px] w-[243px] -translate-x-1/2 flex-col justify-end rounded-lg bg-white px-4 pb-3 pt-2 shadow-md">
+      <div className="absolute left-1/2 top-[18px] h-[112px] w-[190px] -translate-x-1/2 -rotate-[5deg] rounded-lg bg-white/95 sm:h-[118px] sm:w-[211px]" />
+      <div className="absolute left-1/2 top-[10px] h-[124px] w-[205px] -translate-x-1/2 rotate-[3deg] rounded-lg bg-white/95 sm:h-[131px] sm:w-[226px]" />
+      <div className="absolute left-1/2 top-[20px] flex h-[118px] w-[220px] -translate-x-1/2 flex-col justify-end rounded-lg bg-white px-4 pb-3 pt-2 shadow-md sm:h-[124px] sm:w-[243px]">
         <div className="flex items-center justify-between">
           <span className="text-[13px] font-medium text-black-primary">
             Focus First
@@ -226,7 +224,7 @@ function TaskValuePreview() {
 
 function PriorityPlannerPreview() {
   return (
-    <div className="absolute left-[22px] right-[22px] top-1 rounded-tl-xl rounded-br-2xl bg-white shadow-lg">
+    <div className="absolute left-3 right-3 top-1 rounded-tl-xl rounded-br-2xl bg-white shadow-lg sm:left-[22px] sm:right-[22px]">
       <div className="flex items-center gap-1 border-b border-gray-100 p-2">
         <span className="rounded-md bg-indigo-primary/10 px-3 py-1 text-[10px] font-medium text-indigo-primary">
           Day
@@ -285,8 +283,8 @@ function ScheduleRow({
 function FlashcardsPreview() {
   return (
     <div className="relative h-full w-full">
-      <div className="absolute left-1/2 top-[40px] h-[157px] w-[240px] -translate-x-1/2 rounded-lg bg-[#ecf0f3]" />
-      <div className="absolute left-1/2 top-[24px] flex h-[154px] w-[232px] -translate-x-1/2 -rotate-[7deg] flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 shadow-md">
+      <div className="absolute left-1/2 top-[40px] h-[140px] w-[210px] -translate-x-1/2 rounded-lg bg-[#ecf0f3] sm:h-[157px] sm:w-[240px]" />
+      <div className="absolute left-1/2 top-[24px] flex h-[142px] w-[210px] -translate-x-1/2 -rotate-[7deg] flex-col items-center justify-center gap-3 rounded-lg bg-white p-4 shadow-md sm:h-[154px] sm:w-[232px] sm:p-5">
         <p className="text-center text-[11px] font-medium text-black-primary">
           A value-column that uniquely identifies each record is called a ___.
         </p>
@@ -300,7 +298,7 @@ function FlashcardsPreview() {
 
 function QuizLabPreview() {
   return (
-    <div className="absolute left-[22px] right-[22px] top-1 rounded-tl-xl rounded-br-2xl bg-white p-3 shadow-lg">
+    <div className="absolute left-3 right-3 top-1 rounded-tl-xl rounded-br-2xl bg-white p-3 shadow-lg sm:left-[22px] sm:right-[22px]">
       <p className="text-[11px] font-semibold text-black-primary">
         Algorithms Midterm Practice
       </p>
@@ -329,14 +327,14 @@ function StudyCompanionPreview() {
   return (
     <div className="relative h-full w-full">
       <ChatCard
-        className="absolute left-1/2 top-[48px] w-[269px] -translate-x-1/2 opacity-100"
+        className="absolute left-1/2 top-[48px] w-[240px] -translate-x-1/2 opacity-100 sm:w-[269px]"
         primary
       />
       <ChatCard
-        className="absolute left-1/2 top-[112px] w-[245px] -translate-x-1/2 opacity-95"
+        className="absolute left-1/2 top-[112px] w-[220px] -translate-x-1/2 opacity-95 sm:w-[245px]"
       />
       <ChatCard
-        className="absolute left-1/2 top-[168px] w-[226px] -translate-x-1/2 opacity-70"
+        className="absolute left-1/2 top-[168px] w-[205px] -translate-x-1/2 opacity-70 sm:w-[226px]"
         muted
       />
     </div>
@@ -374,9 +372,8 @@ function ChatCard({
           Review
         </button>
         <button
-          className={`flex items-center gap-1 rounded-md px-2 py-1 text-[8px] font-medium text-white ${
-            muted ? "bg-indigo-primary/60" : "bg-indigo-primary"
-          }`}
+          className={`flex items-center gap-1 rounded-md px-2 py-1 text-[8px] font-medium text-white ${muted ? "bg-indigo-primary/60" : "bg-indigo-primary"
+            }`}
         >
           <MessageCircle size={10} />
           Chat with AI
