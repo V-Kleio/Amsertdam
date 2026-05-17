@@ -212,29 +212,29 @@ export default function StudyCompanionChat({
 
     const context = quiz
       ? {
-          quizTitle: quiz.title,
-          course: quiz.course,
-          score: attempt ? `${attempt.correct}/${attempt.total}` : undefined,
-          questions: quiz.questions.map((q) => {
-            const userLetter = attempt?.answers?.[q.id];
-            const userOption = q.options.find((o) => o.letter === userLetter);
-            const correctOption = q.options.find(
-              (o) => o.letter === q.correctAnswer,
-            );
-            return {
-              prompt: q.prompt,
-              userAnswer: userOption
-                ? `${userOption.letter}. ${userOption.text}`
-                : userLetter
-                  ? userLetter
-                  : "(not answered)",
-              correctAnswer: correctOption
-                ? `${correctOption.letter}. ${correctOption.text}`
-                : q.correctAnswer,
-              isCorrect: Boolean(userLetter) && userLetter === q.correctAnswer,
-            };
-          }),
-        }
+        quizTitle: quiz.title,
+        course: quiz.course,
+        score: attempt ? `${attempt.correct}/${attempt.total}` : undefined,
+        questions: quiz.questions.map((q) => {
+          const userLetter = attempt?.answers?.[q.id];
+          const userOption = q.options.find((o) => o.letter === userLetter);
+          const correctOption = q.options.find(
+            (o) => o.letter === q.correctAnswer,
+          );
+          return {
+            prompt: q.prompt,
+            userAnswer: userOption
+              ? `${userOption.letter}. ${userOption.text}`
+              : userLetter
+                ? userLetter
+                : "(not answered)",
+            correctAnswer: correctOption
+              ? `${correctOption.letter}. ${correctOption.text}`
+              : q.correctAnswer,
+            isCorrect: Boolean(userLetter) && userLetter === q.correctAnswer,
+          };
+        }),
+      }
       : undefined;
 
     try {
@@ -307,8 +307,8 @@ export default function StudyCompanionChat({
   };
 
   return (
-    <div className="min-h-screen bg-white px-14.75 py-11.5 flex flex-col">
-      <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5 flex flex-col">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/study-companion"
           className="flex items-center gap-2 text-gray-primary hover:text-black-primary transition-colors"
@@ -323,7 +323,7 @@ export default function StudyCompanionChat({
       </div>
 
       <div className="mb-8">
-        <h1 className="text-[28px] font-semibold text-black-primary mb-2">
+        <h1 className="text-[24px] font-semibold text-black-primary mb-2 sm:text-[28px]">
           Study Companion
         </h1>
         <p className="text-gray-primary">
@@ -335,16 +335,14 @@ export default function StudyCompanionChat({
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"
+              }`}
           >
             <div
-              className={`max-w-2xl rounded-xl p-5 text-sm ${
-                message.role === "user"
+              className={`max-w-2xl rounded-xl p-5 text-sm ${message.role === "user"
                   ? "bg-indigo-primary text-white whitespace-pre-line"
                   : "bg-white border border-gray-200 text-black-primary"
-              }`}
+                }`}
             >
               {message.content ? (
                 message.role === "assistant" ? (
@@ -367,7 +365,7 @@ export default function StudyCompanionChat({
 
       <form
         onSubmit={handleSubmit}
-        className="fixed bottom-6 left-[calc(25%+3.6875rem)] right-14.75 flex items-center gap-3 bg-white border border-gray-200 rounded-full px-5 py-2.5 shadow-sm"
+        className="fixed bottom-4 left-4 right-4 flex items-center gap-3 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm md:bottom-6 md:left-[calc(25%+3.6875rem)] md:right-14.75 md:px-5 md:py-2.5"
       >
         <button
           type="button"

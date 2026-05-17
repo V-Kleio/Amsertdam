@@ -61,9 +61,9 @@ export default function StudyCompanionReview({
   const total = questions.length;
 
   return (
-    <div className="min-h-screen bg-white px-14.75 py-11.5">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5">
       {/* Top bar */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/study-companion"
           className="flex items-center gap-2 text-gray-primary hover:text-black-primary transition-colors"
@@ -73,7 +73,7 @@ export default function StudyCompanionReview({
         </Link>
         <Link
           href={`/study-companion/${quizId}/chat`}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-primary text-white rounded-lg hover:bg-indigo-600 transition-colors text-sm font-medium"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-600 sm:w-auto"
         >
           <MessagesSquare size={16} />
           Chat with AI
@@ -82,7 +82,7 @@ export default function StudyCompanionReview({
 
       {/* Title */}
       <div className="mb-10">
-        <h1 className="text-[28px] font-semibold text-black-primary mb-2">
+        <h1 className="mb-2 text-[24px] font-semibold text-black-primary sm:text-[28px]">
           {quiz.title}
         </h1>
         <p className="text-gray-primary">
@@ -105,7 +105,7 @@ export default function StudyCompanionReview({
         {questions.map((q, idx) => (
           <div
             key={q.id}
-            className="bg-white border border-gray-200 rounded-xl p-5"
+            className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5"
           >
             <div className="flex items-start gap-3">
               <div className="mt-0.5 shrink-0">
