@@ -55,8 +55,8 @@ export default function QuizResult({
   }, [quiz, total, correct, answers, recordAttempt]);
 
   return (
-    <div className="min-h-screen bg-white px-14.75 py-11.5">
-      <div className="mb-10">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5">
+      <div className="mb-8 sm:mb-10">
         <Link
           href="/quiz-lab"
           className="flex items-center gap-2 text-black-primary hover:text-indigo-primary transition-colors"
@@ -66,26 +66,26 @@ export default function QuizResult({
         </Link>
       </div>
 
-      <div className="text-center mb-14">
-        <h1 className="text-[32px] font-semibold text-black-primary mb-3">
+      <div className="mb-10 text-center sm:mb-14">
+        <h1 className="mb-3 text-[26px] font-semibold text-black-primary sm:text-[32px]">
           Quiz Complete
         </h1>
-        <p className="text-[48px] font-semibold text-indigo-primary mb-3">
+        <p className="mb-3 text-[36px] font-semibold text-indigo-primary sm:text-[48px]">
           {correct}/{total}
         </p>
         <p className="text-base text-gray-primary mb-6">
           You answered {correct} out of {total} questions correctly
         </p>
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
           <Link
             href={`/quiz-lab/${quiz.id}/take`}
-            className="rounded-lg border border-gray-300 px-6 py-2.5 text-sm font-medium text-black-primary hover:bg-gray-50 transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-6 py-2.5 text-center text-sm font-medium text-black-primary transition-colors hover:bg-gray-50 sm:w-auto"
           >
             Retake Quiz
           </Link>
           <Link
             href={`/study-companion/${quiz.id}/chat`}
-            className="rounded-lg bg-indigo-primary px-6 py-2.5 text-sm font-medium text-white hover:opacity-90 transition"
+            className="w-full rounded-lg bg-indigo-primary px-6 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
           >
             Review with Study Companion
           </Link>

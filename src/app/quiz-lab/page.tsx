@@ -105,14 +105,14 @@ export default function QuizLab() {
   };
 
   useEffect(() => {
-    fetchInitial().catch(() => {});
+    fetchInitial().catch(() => { });
   }, [fetchInitial]);
 
   return (
-    <div className="min-h-screen bg-white px-14.75 py-11.5">
-      <header className="flex justify-between items-start mb-12">
-        <div>
-          <h1 className="text-[28px] font-semibold text-black-primary mb-2">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5">
+      <header className="mb-8 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-2xl">
+          <h1 className="mb-2 text-[24px] font-semibold text-black-primary sm:text-[28px]">
             Quiz Lab
           </h1>
           <p className="text-gray-primary">
@@ -121,7 +121,7 @@ export default function QuizLab() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-primary text-white rounded-lg hover:bg-indigo-600 transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-primary px-4 py-2.5 text-white transition-colors hover:bg-indigo-600 sm:w-auto"
         >
           <CirclePlus size={18} />
           Create New Quiz
@@ -129,8 +129,8 @@ export default function QuizLab() {
       </header>
 
       <section>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-black-primary">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-black-primary sm:text-xl">
             Your Quizzes
           </h2>
           <span className="text-sm text-gray-primary">
@@ -149,80 +149,80 @@ export default function QuizLab() {
             </p>
           </div>
         ) : (
-        <div className="grid grid-cols-2 gap-6">
-          {quizzes.map((quiz) => (
-            <article
-              key={quiz.id}
-              className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col"
-            >
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-base font-semibold text-black-primary truncate">
-                      {quiz.title}
-                    </h3>
-                    <span className="flex items-center gap-1 text-[10px] font-medium text-indigo-primary bg-indigo-primary/10 px-1.5 py-0.5 rounded">
-                      <Sparkles size={10} />
-                      AI
-                    </span>
-                    <button
-                      title="Delete quiz"
-                      onClick={async () => {
-                        if (!confirm("Delete this quiz?")) return;
-                        await removeQuiz(quiz.id);
-                      }}
-                      className="ml-auto text-red-400 hover:text-red-600"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+            {quizzes.map((quiz) => (
+              <article
+                key={quiz.id}
+                className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col"
+              >
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-base font-semibold text-black-primary truncate">
+                        {quiz.title}
+                      </h3>
+                      <span className="flex items-center gap-1 text-[10px] font-medium text-indigo-primary bg-indigo-primary/10 px-1.5 py-0.5 rounded">
+                        <Sparkles size={10} />
+                        AI
+                      </span>
+                      <button
+                        title="Delete quiz"
+                        onClick={async () => {
+                          if (!confirm("Delete this quiz?")) return;
+                          await removeQuiz(quiz.id);
+                        }}
+                        className="ml-auto text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                    <p className="text-sm text-gray-primary mb-2">
+                      {quiz.course} &bull; {quiz.questions.length} questions
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      Source: {quiz.source}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-primary mb-2">
-                    {quiz.course} &bull; {quiz.questions.length} questions
-                  </p>
-                  <p className="text-xs text-gray-400 truncate">
-                    Source: {quiz.source}
-                  </p>
+                  <Link
+                    href={`/quiz-lab/${quiz.id}/take`}
+                    className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-indigo-primary text-white text-sm rounded-lg hover:bg-indigo-600 transition-colors flex-shrink-0"
+                  >
+                    <Play size={14} />
+                    Take Quiz
+                  </Link>
                 </div>
-                <Link
-                  href={`/quiz-lab/${quiz.id}/take`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-primary text-white text-sm rounded-lg hover:bg-indigo-600 transition-colors flex-shrink-0"
-                >
-                  <Play size={14} />
-                  Take Quiz
-                </Link>
-              </div>
 
-              <div className="flex items-center gap-5 pt-4 border-t border-gray-100 mt-auto">
-                <Link
-                  href={`/quiz-lab/${quiz.id}/preview`}
-                  className="flex items-center gap-1.5 text-sm text-gray-primary hover:text-indigo-primary transition-colors"
-                >
-                  <FileText size={14} />
-                  Preview
-                </Link>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      await downloadQuizPdf(quiz);
-                      toast.success("PDF downloaded");
-                    } catch (err) {
-                      toast.error(
-                        err instanceof Error
-                          ? err.message
-                          : "Failed to generate PDF",
-                      );
-                    }
-                  }}
-                  className="flex items-center gap-1.5 text-sm text-gray-primary hover:text-indigo-primary transition-colors"
-                >
-                  <Download size={14} />
-                  Download
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
+                <div className="flex items-center gap-5 pt-4 border-t border-gray-100 mt-auto">
+                  <Link
+                    href={`/quiz-lab/${quiz.id}/preview`}
+                    className="flex items-center gap-1.5 text-sm text-gray-primary hover:text-indigo-primary transition-colors"
+                  >
+                    <FileText size={14} />
+                    Preview
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await downloadQuizPdf(quiz);
+                        toast.success("PDF downloaded");
+                      } catch (err) {
+                        toast.error(
+                          err instanceof Error
+                            ? err.message
+                            : "Failed to generate PDF",
+                        );
+                      }
+                    }}
+                    className="flex items-center gap-1.5 text-sm text-gray-primary hover:text-indigo-primary transition-colors"
+                  >
+                    <Download size={14} />
+                    Download
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
         )}
       </section>
 

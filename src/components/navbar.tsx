@@ -4,12 +4,14 @@ import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { useCurrentUser } from "@/lib/use-current-user";
+import HamburgerIcon from "@/components/icons/hamburger-icon";
 
 interface NavbarProps {
   className?: string;
+  onOpenSidebar?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ className = "" }) => {
+const Navbar: React.FC<NavbarProps> = ({ className = "", onOpenSidebar }) => {
   const router = useRouter();
   const { user } = useCurrentUser();
   const [searchValue, setSearchValue] = useState("");
@@ -34,21 +36,29 @@ const Navbar: React.FC<NavbarProps> = ({ className = "" }) => {
 
   return (
     <nav
-      className={`flex w-full items-center justify-between bg-cyan-light pt-5 px-7.25 ${className}`}
+      className={`flex w-full flex-col gap-4 bg-cyan-light px-4 py-4 md:flex-row md:items-center md:justify-between md:gap-6 md:px-7.25 md:pt-5 ${className}`}
     >
-      <section>
+      <section className="flex items-center gap-3">
+        <button
+          type="button"
+          aria-label="Open sidebar"
+          className="rounded md:hidden"
+          onClick={onOpenSidebar}
+        >
+          <HamburgerIcon size={22} className="stroke-black-primary" />
+        </button>
         <Image
           src="/logo.svg"
           alt="RealTrack Logo"
           width={187}
           height={64}
-          className="w-full"
+          className="h-auto w-[140px] md:w-[187px]"
           loading="eager"
         />
       </section>
 
       <form
-        className="flex h-14 w-126.25 items-center gap-4 rounded-[100px] bg-[#F5F5F5] px-4"
+        className="flex h-12 w-full items-center gap-3 rounded-[100px] bg-[#F5F5F5] px-4 md:h-14 md:w-126.25 md:gap-4"
         onSubmit={handleSearch}
       >
         <Search size={20} />
@@ -59,16 +69,20 @@ const Navbar: React.FC<NavbarProps> = ({ className = "" }) => {
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           placeholder="Search courses, tasks, flashcards, quizzes"
-          className="bg-transparent outline-none w-full"
+          className="bg-transparent outline-none w-full text-sm md:text-base"
         />
       </form>
 
-      <div className="flex items-center gap-4">
-        <div className="flex flex-col">
-          <span className="font-medium text-black-primary">{profileName}</span>
-          <span className="text-[14px] text-gray-primary">{profileSubtitle}</span>
+      <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex flex-col text-right md:text-left">
+          <span className="text-sm font-medium text-black-primary md:text-base">
+            {profileName}
+          </span>
+          <span className="text-xs text-gray-primary md:text-[14px]">
+            {profileSubtitle}
+          </span>
         </div>
-        <div className="flex h-13 w-13 items-center justify-center rounded-full border-2 border-gray-500 bg-indigo-primary text-sm font-semibold text-white">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-gray-500 bg-indigo-primary text-xs font-semibold text-white md:h-13 md:w-13 md:text-sm">
           {initials || "U"}
         </div>
       </div>
