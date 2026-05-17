@@ -107,7 +107,8 @@ export default function PriorityPlanner() {
             startDate: new Date().toISOString().slice(0, 10),
             workingHoursPerDay: 6,
           },
-          contextNote: "Plan the most urgent items first and keep the load realistic.",
+          contextNote:
+            "Plan the most urgent items first and keep the load realistic.",
         }),
       });
 
@@ -234,12 +235,10 @@ export default function PriorityPlanner() {
     return events.filter((event) => {
       const eventDate = new Date(event.date);
 
-      // DAY
       if (selected === "Day") {
         return eventDate.toDateString() === selectedDate.toDateString();
       }
 
-      // WEEK
       if (selected === "Week") {
         const startOfWeek = new Date(selectedDate);
         startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
@@ -250,11 +249,8 @@ export default function PriorityPlanner() {
         return eventDate >= startOfWeek && eventDate <= endOfWeek;
       }
 
-      // MONTH
       if (selected === "Month") {
-        return (
-          eventDate.getMonth() === month && eventDate.getFullYear() === year
-        );
+        return eventDate.getMonth() === month && eventDate.getFullYear() === year;
       }
 
       return false;
@@ -274,11 +270,10 @@ export default function PriorityPlanner() {
   const [isAddScheduleOpen, setIsAddScheduleOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-9 px-14.75 py-11.5 w-full">
-      {/* Header */}
-      <div className="flex flex-row justify-between items-center">
+    <div className="flex w-full flex-col gap-9 px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col">
-          <h1 className="text-[28px] font-semibold text-black-primary">
+          <h1 className="text-[24px] font-semibold text-black-primary sm:text-[28px]">
             Priority Planner
           </h1>
           <p className="text-gray-primary font-medium text-sm">
@@ -286,11 +281,11 @@ export default function PriorityPlanner() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
           <button
             onClick={handleAiSchedule}
             disabled={aiLoading || !tasks.length}
-            className="flex flex-row gap-2 px-3 py-2 rounded-lg border border-indigo-primary text-indigo-primary items-center cursor-pointer hover:bg-indigo-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex flex-row items-center justify-center gap-2 rounded-lg border border-indigo-primary px-3 py-2 text-indigo-primary transition-colors hover:bg-indigo-primary/5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {aiLoading ? (
               <Loader2 size={16} className="animate-spin" />
@@ -301,7 +296,7 @@ export default function PriorityPlanner() {
           </button>
           <button
             onClick={() => setIsAddScheduleOpen(true)}
-            className="flex flex-row gap-2 px-3 py-2 rounded-lg bg-indigo-primary text-white items-center cursor-pointer hover:bg-indigo-500 transition-colors"
+            className="flex flex-row items-center justify-center gap-2 rounded-lg bg-indigo-primary px-3 py-2 text-white transition-colors hover:bg-indigo-500"
           >
             <CirclePlus size={16} />
             Add Schedule
@@ -316,17 +311,14 @@ export default function PriorityPlanner() {
         </div>
       )}
 
-      {/* Content */}
       <div className="flex flex-col gap-6">
-        <div className="flex flex-row justify-between items-end">
-          {/* repetition day/week/month */}
-          <div className="flex flex-row gap-18 p-2 bg-[#3D42E51A] rounded-xl">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex w-full flex-row gap-4 rounded-xl bg-[#3D42E51A] p-2 sm:w-auto sm:gap-18">
             {["Day", "Week", "Month"].map((label) => (
               <button
                 key={label}
-                className={`px-5 py-1.5 rounded-lg cursor-pointer ${
-                  selected === label ? "bg-white" : ""
-                }`}
+                className={`flex-1 rounded-lg px-5 py-1.5 text-center cursor-pointer sm:flex-none ${selected === label ? "bg-white" : ""
+                  }`}
                 onClick={() => setSelected(label as "Day" | "Week" | "Month")}
               >
                 {label}
@@ -334,8 +326,7 @@ export default function PriorityPlanner() {
             ))}
           </div>
 
-          {/* types */}
-          <div className="flex flex-row gap-9">
+          <div className="flex flex-row flex-wrap gap-4 sm:gap-9">
             {getFilteredEvents().map((event) => (
               <div key={event.id} className="flex flex-row items-center gap-3">
                 <div className={`w-2 h-2 rounded-full ${event.color}`}></div>
@@ -348,9 +339,7 @@ export default function PriorityPlanner() {
             ))}
           </div>
 
-          {/* dates */}
-          {/* Month Navigation */}
-          <div className="flex items-end justify-between">
+          <div className="flex items-end justify-between sm:justify-end sm:gap-2">
             <button
               onClick={
                 selected === "Day"
@@ -376,7 +365,9 @@ export default function PriorityPlanner() {
                 />
               </svg>
             </button>
-            <h3 className="text-lg font-medium text-gray-900">{monthName}</h3>
+            <h3 className="text-base font-medium text-gray-900 sm:text-lg">
+              {monthName}
+            </h3>
             <button
               onClick={
                 selected === "Day"
@@ -406,18 +397,11 @@ export default function PriorityPlanner() {
         </div>
       </div>
 
-      <div
-        className="flex flex-col p-7 items-start self-stretch gap-5"
-        style={{
-          borderRadius: "16px",
-          border: "1px solid rgba(204, 204, 204, 0.75)",
-        }}
-      >
+      <div className="flex flex-col items-start gap-5 self-stretch rounded-2xl border border-[rgba(204,204,204,0.75)] p-5 sm:p-7">
         <h1>
           {dayName}, {selectedDay} {monthName}
         </h1>
 
-        {/* cards iteration of events */}
         {getFilteredEvents().map((event) => (
           <div
             key={event.id}
