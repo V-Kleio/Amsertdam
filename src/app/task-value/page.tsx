@@ -49,11 +49,11 @@ export default function TaskValue() {
       course: task.course || "General",
       date: task.deadline
         ? new Date(task.deadline).toLocaleString("en-US", {
-            month: "short",
-            day: "numeric",
-            hour: "numeric",
-            minute: "2-digit",
-          })
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        })
         : "—",
       timeEstimate: task.estimatedHours ? `${task.estimatedHours}h` : "—",
       priority: "If You Have Energy",
@@ -185,22 +185,22 @@ export default function TaskValue() {
   };
 
   return (
-    <div className="min-h-screen bg-white px-14.75 py-11.5">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5">
       {/* Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <h1 className="text-[28px] font-semibold text-black-primary mb-2">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-2xl">
+          <h1 className="text-[24px] font-semibold text-black-primary sm:text-[28px] mb-2">
             Task Value
           </h1>
           <p className="text-gray-primary">
             Helping you allocate effort sustainably while protecting your wellbeing
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
           <button
             onClick={handleAiPrioritize}
             disabled={aiLoading || tasks.length === 0}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-indigo-primary text-indigo-primary hover:bg-indigo-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 rounded-lg border border-indigo-primary px-4 py-2.5 text-indigo-primary transition-colors hover:bg-indigo-primary/5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {aiLoading ? (
               <Loader2 size={18} className="animate-spin" />
@@ -211,7 +211,7 @@ export default function TaskValue() {
           </button>
           <button
             onClick={() => setShowAddTaskModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-primary text-white rounded-lg hover:bg-indigo-600 transition-colors"
+            className="flex items-center justify-center gap-2 rounded-lg bg-indigo-primary px-4 py-2.5 text-white transition-colors hover:bg-indigo-600"
           >
             <CirclePlus size={18} />
             Add Task
@@ -229,15 +229,15 @@ export default function TaskValue() {
       )}
 
       {/* What to Work on First Section */}
-      <div className="mb-8 bg-white border border-gray-200 rounded-xl p-5">
-        <h2 className="text-[20px] font-semibold text-black-primary mb-5">
+      <div className="mb-8 rounded-xl border border-gray-200 bg-white p-5">
+        <h2 className="mb-5 text-[18px] font-semibold text-black-primary sm:text-[20px]">
           What to Work on First?
         </h2>
-        <div className="flex flex-row gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {priorityCards.map((card) => (
             <div
               key={card.priority}
-              className="flex-col gap-2.5 px-4 pt-4 rounded-lg w-1/3"
+              className="flex flex-col gap-2.5 rounded-lg px-4 pt-4"
               style={{
                 background: card.gradient,
               }}
@@ -249,13 +249,13 @@ export default function TaskValue() {
                 <div style={{ color: card.iconColor }}>{card.icon}</div>
               </div>
 
-              <div className="flex flex-row">
+              <div className="flex flex-row gap-2">
                 <Image
                   src={card.image}
                   alt={`${card.priority} Tasks`}
                   width={185}
                   height={87}
-                  className="w-46.25 h-21.75"
+                  className="h-auto w-24 sm:w-32"
                 />
                 <div>
                   <h1 className="text-sm">
@@ -276,7 +276,7 @@ export default function TaskValue() {
       </div>
 
       {/* Info Message */}
-      <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 mb-8">
+      <div className="mb-8 rounded-lg border border-indigo-100 bg-indigo-50 p-4">
         <p className="text-sm text-gray-700">
           <span className="font-medium">It&apos;s okay to let go.</span> One task can be minimized or skipped without affecting your ability to pass. Protecting your energy is a valid choice.
         </p>
@@ -284,7 +284,7 @@ export default function TaskValue() {
 
       {/* Focus First Section */}
       <div className="mb-8">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="mb-3 flex items-center gap-2">
           <CircleAlert size={18} className="text-[#E53D3D]" />
           <h2 className="text-lg font-semibold text-black-primary">
             Focus First
@@ -297,9 +297,9 @@ export default function TaskValue() {
           {getTasksByPriority("Focus First").map((task) => (
             <div
               key={task.id}
-              className="bg-white border border-gray-200 rounded-xl p-5"
+              className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5"
             >
-              <div className="flex justify-between items-start">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
                 <div className="flex-1">
                   <h3 className="text-base font-semibold text-black-primary mb-1">
                     {task.title}
@@ -310,7 +310,7 @@ export default function TaskValue() {
                     <span>{task.date}</span>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1.5">
+                <div className="flex flex-col items-end gap-1.5 justify-self-end">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityBadgeStyles(
                       task.priority
@@ -347,7 +347,7 @@ export default function TaskValue() {
 
       {/* If You Have Energy Section */}
       <div className="mb-8">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="mb-3 flex items-center gap-2">
           <CircleHelp size={18} className="text-[#E5B03D]" />
           <h2 className="text-lg font-semibold text-black-primary">
             If You Have Energy
@@ -360,9 +360,9 @@ export default function TaskValue() {
           {getTasksByPriority("If You Have Energy").map((task) => (
             <div
               key={task.id}
-              className="bg-white border border-gray-200 rounded-xl p-5"
+              className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5"
             >
-              <div className="flex justify-between items-start">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
                 <div className="flex-1">
                   <h3 className="text-base font-semibold text-black-primary mb-1">
                     {task.title}
@@ -373,7 +373,7 @@ export default function TaskValue() {
                     <span>{task.date}</span>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1.5">
+                <div className="flex flex-col items-end gap-1.5 justify-self-end">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityBadgeStyles(
                       task.priority
@@ -410,7 +410,7 @@ export default function TaskValue() {
 
       {/* Safe to Minimize Section */}
       <div className="mb-8">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="mb-3 flex items-center gap-2">
           <CircleCheck size={18} className="text-[#73C58F]" />
           <h2 className="text-lg font-semibold text-black-primary">
             Safe to Minimize
@@ -423,9 +423,9 @@ export default function TaskValue() {
           {getTasksByPriority("Safe to Minimize").map((task) => (
             <div
               key={task.id}
-              className="bg-white border border-gray-200 rounded-xl p-5"
+              className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5"
             >
-              <div className="flex justify-between items-start">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
                 <div className="flex-1">
                   <h3 className="text-base font-semibold text-black-primary mb-1">
                     {task.title}
@@ -436,7 +436,7 @@ export default function TaskValue() {
                     <span>{task.date}</span>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1.5">
+                <div className="flex flex-col items-end gap-1.5 justify-self-end">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityBadgeStyles(
                       task.priority
@@ -485,7 +485,7 @@ export default function TaskValue() {
 function InitWrapper() {
   const fetchInitial = useStore((s) => s.fetchInitial);
   useEffect(() => {
-    fetchInitial().catch(() => {});
+    fetchInitial().catch(() => { });
   }, [fetchInitial]);
   return null;
 }
