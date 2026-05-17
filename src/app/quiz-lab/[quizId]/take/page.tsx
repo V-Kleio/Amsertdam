@@ -46,11 +46,11 @@ export default function TakeQuiz({
   };
 
   return (
-    <div className="min-h-screen bg-white px-14.75 py-11.5">
-      <div className="flex gap-8">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5">
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
         <div className="flex-1 max-w-[920px]">
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3 flex items-center justify-between">
               <Link
                 href="/quiz-lab"
                 className="flex items-center gap-2 text-black-primary hover:text-indigo-primary transition-colors"
@@ -70,12 +70,12 @@ export default function TakeQuiz({
             </div>
           </div>
 
-          <h1 className="text-[24px] font-semibold text-black-primary mb-2">
+          <h1 className="mb-2 text-[22px] font-semibold text-black-primary sm:text-[24px]">
             {quiz.title}
           </h1>
 
-          <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <h2 className="text-lg font-medium text-black-primary mb-6">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
+            <h2 className="mb-6 text-base font-medium text-black-primary sm:text-lg">
               {question.prompt}
             </h2>
             <div className="flex flex-col gap-3">
@@ -86,22 +86,20 @@ export default function TakeQuiz({
                     key={opt.letter}
                     type="button"
                     onClick={() => handleSelect(opt.letter)}
-                    className={`flex items-center gap-4 rounded-lg border px-4 py-3 text-left transition-colors ${
-                      isSelected
+                    className={`flex items-center gap-4 rounded-lg border px-4 py-3 text-left transition-colors ${isSelected
                         ? "border-indigo-primary bg-indigo-primary/5"
                         : "border-gray-200 hover:border-indigo-primary/50"
-                    }`}
+                      }`}
                   >
                     <span
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm font-semibold ${
-                        isSelected
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm font-semibold sm:h-10 sm:w-10 ${isSelected
                           ? "border-indigo-primary bg-indigo-primary text-white"
                           : "border-gray-300 text-black-primary"
-                      }`}
+                        }`}
                     >
                       {opt.letter}
                     </span>
-                    <span className="text-base text-black-primary">
+                    <span className="text-sm text-black-primary sm:text-base">
                       {opt.text}
                     </span>
                   </button>
@@ -110,7 +108,7 @@ export default function TakeQuiz({
             </div>
           </div>
 
-          <div className="mt-8 flex justify-end">
+          <div className="mt-6 flex justify-end sm:mt-8">
             <button
               type="button"
               onClick={handleNext}
@@ -123,7 +121,7 @@ export default function TakeQuiz({
           </div>
         </div>
 
-        <aside className="w-[214px] shrink-0">
+        <aside className="w-full shrink-0 lg:w-[214px]">
           <div className="rounded-xl border border-gray-200 bg-white p-4">
             <h3 className="text-sm font-semibold text-black-primary mb-4">
               Quiz Navigation
@@ -137,13 +135,12 @@ export default function TakeQuiz({
                     key={q.id}
                     type="button"
                     onClick={() => setCurrent(idx)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-semibold transition-colors ${
-                      active
+                    className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-semibold transition-colors ${active
                         ? "bg-indigo-primary text-white"
                         : answered
                           ? "bg-indigo-primary/10 text-indigo-primary"
                           : "border border-gray-300 text-gray-primary hover:border-indigo-primary"
-                    }`}
+                      }`}
                   >
                     {idx + 1}
                   </button>
