@@ -16,7 +16,7 @@ export default function Flashcards() {
   const removeDeck = useStore((s) => s.removeDeck);
 
   useEffect(() => {
-    fetchInitial().catch(() => {});
+    fetchInitial().catch(() => { });
   }, [fetchInitial]);
 
   const handleCreated = (data: {
@@ -27,11 +27,11 @@ export default function Flashcards() {
   };
 
   return (
-    <div className="min-h-screen bg-white px-14.75 py-11.5">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5">
       {/* Header */}
-      <div className="flex justify-between items-start mb-12">
-        <div>
-          <h1 className="text-[28px] font-semibold text-black-primary mb-2">
+      <div className="mb-8 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-2xl">
+          <h1 className="mb-2 text-[24px] font-semibold text-black-primary sm:text-[28px]">
             Flashcards
           </h1>
           <p className="text-gray-primary">
@@ -40,7 +40,7 @@ export default function Flashcards() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-primary text-white rounded-lg hover:bg-indigo-600 transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-primary px-4 py-2.5 text-white transition-colors hover:bg-indigo-600 sm:w-auto"
         >
           <CirclePlus size={18} />
           Create Flashcard
@@ -49,8 +49,8 @@ export default function Flashcards() {
 
       {/* Your Decks Section */}
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-black-primary">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-black-primary sm:text-xl">
             Your Decks
           </h2>
           <span className="text-sm text-gray-primary">{decks.length} elements</span>
@@ -68,19 +68,19 @@ export default function Flashcards() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
             {decks.map((deck) => (
               <div
                 key={deck.id}
                 className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow"
               >
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                   <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-indigo-primary/20 to-purple-300/30 flex items-center justify-center">
                     <Sparkles size={24} className="text-indigo-primary" />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
                       <h3 className="text-base font-semibold text-black-primary truncate">
                         {deck.title}
                       </h3>
@@ -103,7 +103,7 @@ export default function Flashcards() {
                     </p>
                   </div>
 
-                  <div className="flex flex-col items-center gap-3">
+                  <div className="flex flex-row items-center justify-between gap-4 sm:flex-col sm:items-center sm:gap-3">
                     <div className="text-center">
                       <p className="text-2xl font-semibold text-black-primary">
                         {deck.cardCount}

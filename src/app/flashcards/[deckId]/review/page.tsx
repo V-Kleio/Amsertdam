@@ -76,15 +76,15 @@ export default function FlashcardReview({
 
   const deck: Deck = generatedDeck
     ? {
-        id: generatedDeck.id,
-        title: generatedDeck.title,
-        description: generatedDeck.description,
-        cards: generatedDeck.cards.map((c) => ({
-          id: c.id,
-          question: c.question,
-          answer: c.answer,
-        })),
-      }
+      id: generatedDeck.id,
+      title: generatedDeck.title,
+      description: generatedDeck.description,
+      cards: generatedDeck.cards.map((c) => ({
+        id: c.id,
+        question: c.question,
+        answer: c.answer,
+      })),
+    }
     : { id: deckId, ...STATIC_DECK };
 
   const currentCard = deck.cards[currentCardIndex];
@@ -115,9 +115,9 @@ export default function FlashcardReview({
   };
 
   return (
-    <div className="min-h-screen bg-white px-14.75 py-11.5">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <Link
           href="/flashcards"
           className="flex items-center gap-2 text-gray-primary hover:text-black-primary transition-colors"
@@ -131,27 +131,27 @@ export default function FlashcardReview({
       </div>
 
       {/* Deck Title */}
-      <div className="text-center mb-12">
-        <h1 className="text-[28px] font-semibold text-indigo-primary mb-2">
+      <div className="mb-10 text-center sm:mb-12">
+        <h1 className="mb-2 text-[22px] font-semibold text-indigo-primary sm:text-[28px]">
           {deck.title}
         </h1>
         <p className="text-gray-primary">{deck.description}</p>
       </div>
 
       {/* Flashcard */}
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white border border-gray-200 rounded-2xl p-12 mb-8 min-h-[280px] flex flex-col justify-center">
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-8 flex min-h-[240px] flex-col justify-center rounded-2xl border border-gray-200 bg-white p-6 sm:min-h-[280px] sm:p-12">
           {/* Question */}
-          <p className="text-lg text-black-primary text-center mb-8">
+          <p className="mb-8 text-center text-base text-black-primary sm:text-lg">
             {currentCard.question}
           </p>
 
           {/* Answer Section */}
           <div
-            className="bg-indigo-50 rounded-xl p-6 cursor-pointer hover:bg-indigo-100 transition-colors"
+            className="cursor-pointer rounded-xl bg-indigo-50 p-4 transition-colors hover:bg-indigo-100 sm:p-6"
             onClick={() => setShowAnswer(!showAnswer)}
           >
-            <p className="text-center text-2xl font-mono tracking-wider text-black-primary">
+            <p className="text-center text-xl font-mono tracking-wider text-black-primary sm:text-2xl">
               {showAnswer ? currentCard.answer : formatAnswerBlanks(currentCard.answer)}
             </p>
           </div>
@@ -176,14 +176,14 @@ export default function FlashcardReview({
         </div>
 
         {/* Mascot Message */}
-        <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-3 bg-indigo-50 rounded-2xl px-3 max-w-[300px]">
+        <div className="mb-8 flex justify-center">
+          <div className="flex items-center gap-3 rounded-2xl bg-indigo-50 px-3 max-w-[320px]">
             <Image
-            src="/blue-girl.svg"
-            alt="Mascot"
-            width={64}
-            height={64}
-            className="w-full h-full"
+              src="/blue-girl.svg"
+              alt="Mascot"
+              width={64}
+              height={64}
+              className="h-14 w-14 sm:h-16 sm:w-16"
             />
             <p className="text-sm text-gray-primary py-0">
               Take your time. No scores, no streaks.
@@ -192,7 +192,7 @@ export default function FlashcardReview({
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex items-center justify-center gap-4">
           <button
             onClick={handlePrevious}
             disabled={currentCardIndex === 0}
