@@ -144,7 +144,7 @@ export default function CourseForm({ onSubmit, onCancel }: CourseFormProps) {
       className="fixed inset-0 flex justify-center items-center z-50"
       style={{ background: "rgba(0, 0, 0, 0.64)" }}
     >
-      <div className="bg-white rounded-2xl shadow-lg w-125 p-6 relative">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6 relative mx-4 max-h-[90vh] overflow-y-auto">
         {/* Close button */}
         <button
           onClick={onCancel}

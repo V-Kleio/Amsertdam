@@ -69,24 +69,24 @@ function normalizeCourse(course: any): Courses {
     scheduleEntries: Array.isArray(course.schedule_entries)
       ? course.schedule_entries
       : Array.isArray(course.scheduleEntries)
-      ? course.scheduleEntries
-      : Array.isArray(packedMeta.scheduleEntries)
-      ? packedMeta.scheduleEntries
-      : [],
+        ? course.scheduleEntries
+        : Array.isArray(packedMeta.scheduleEntries)
+          ? packedMeta.scheduleEntries
+          : [],
     typeTracking: packedMeta.typeTracking ?? course.typeTracking ?? "On Track",
     threshold: packedMeta.threshold ?? course.threshold ?? null,
     passingGrade: packedMeta.threshold ?? course.passingGrade ?? course.threshold ?? undefined,
     assessments: Array.isArray(course.assessments)
       ? course.assessments
       : Array.isArray(packedMeta.assessments)
-      ? packedMeta.assessments
-      : [],
+        ? packedMeta.assessments
+        : [],
     passingRequirement: packedMeta.passingRequirement ?? course.passingRequirement ?? "",
     requirements: Array.isArray(course.requirements)
       ? course.requirements
       : Array.isArray(packedMeta.requirements)
-      ? packedMeta.requirements
-      : [],
+        ? packedMeta.requirements
+        : [],
     thresholdResult: course.thresholdResult,
     isCalculating: course.isCalculating,
   };
@@ -205,7 +205,7 @@ export default function PassingTarget() {
           requirements: course.requirements ?? [],
         }),
       });
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -216,7 +216,7 @@ export default function PassingTarget() {
         const courses = await c.json();
         if (!Array.isArray(courses)) return;
         setCourseItems(courses.map(normalizeCourse));
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -393,8 +393,7 @@ export default function PassingTarget() {
     if (currentCredits + newCredits > 24) {
       const remaining = Math.max(0, 24 - currentCredits);
       alert(
-        `Cannot add course: total credits would be ${
-          currentCredits + newCredits
+        `Cannot add course: total credits would be ${currentCredits + newCredits
         }, exceeding the 24-credit maximum.\n\nRemaining capacity: ${remaining} credits.`,
       );
       return;
@@ -423,7 +422,7 @@ export default function PassingTarget() {
           setShowForm(false);
           return
         }
-      } catch {}
+      } catch { }
       const updated = [...courseItems, normalizeCourse({ ...newCourse })];
       setCourseItems(updated);
       setShowForm(false);
@@ -442,8 +441,7 @@ export default function PassingTarget() {
     if (currentTotal + assessment.weight > 100) {
       const remaining = Math.max(0, 100 - currentTotal);
       alert(
-        `Cannot add assessment: total weight would be ${
-          currentTotal + assessment.weight
+        `Cannot add assessment: total weight would be ${currentTotal + assessment.weight
         }%, exceeding the 100% maximum.\n\nRemaining capacity: ${remaining}%.`,
       );
       return;
@@ -453,9 +451,9 @@ export default function PassingTarget() {
         i !== courseIndex
           ? course
           : {
-              ...course,
-              assessments: [...(course.assessments || []), assessment],
-            },
+            ...course,
+            assessments: [...(course.assessments || []), assessment],
+          },
       );
       void persistCourse(updated[courseIndex]);
       triggerCompute(courseIndex, updated);
@@ -478,8 +476,7 @@ export default function PassingTarget() {
     if (currentItemTotal + item.weight > assessment.weight) {
       const remaining = Math.max(0, assessment.weight - currentItemTotal);
       alert(
-        `Cannot add item: total item weight would be ${
-          currentItemTotal + item.weight
+        `Cannot add item: total item weight would be ${currentItemTotal + item.weight
         }%, exceeding the assessment maximum of ${assessment.weight}%.\n\nRemaining capacity: ${remaining}%.`,
       );
       return;
@@ -489,16 +486,16 @@ export default function PassingTarget() {
         ci !== courseIndex
           ? course
           : {
-              ...course,
-              assessments: course.assessments?.map((assessment, ai) =>
-                ai !== assessIdx
-                  ? assessment
-                  : {
-                      ...assessment,
-                      items: [...(assessment.items || []), item],
-                    },
-              ),
-            },
+            ...course,
+            assessments: course.assessments?.map((assessment, ai) =>
+              ai !== assessIdx
+                ? assessment
+                : {
+                  ...assessment,
+                  items: [...(assessment.items || []), item],
+                },
+            ),
+          },
       );
       void persistCourse(updated[courseIndex]);
       triggerCompute(courseIndex, updated);
@@ -622,10 +619,10 @@ export default function PassingTarget() {
   };
 
   return (
-    <div className="px-14.75 py-11.5 w-full">
+    <div className="w-full px-4 py-6 sm:px-6 lg:px-14.75 md:py-11.5">
       {/* Courses Overview */}
       <div className="flex flex-col gap-8">
-        <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-row flex-wrap items-center justify-between gap-4">
           <div className="flex flex-col">
             <h1 className="text-[20px] font-semibold text-black-primary">
               Passing Target
@@ -637,7 +634,7 @@ export default function PassingTarget() {
 
           <button
             onClick={() => setShowForm(true)}
-            className="flex flex-row gap-2 px-3 py-2 rounded-lg bg-indigo-primary text-white items-center cursor-pointer hover:bg-indigo-500 transition-colors"
+            className="flex flex-row items-center gap-2 rounded-lg bg-indigo-primary px-4 py-2 text-white transition-colors hover:bg-indigo-500"
           >
             <CirclePlus size={16} />
             Add Course
@@ -652,11 +649,11 @@ export default function PassingTarget() {
             >
               {/* Course Header */}
               <div
-                className="flex flex-row justify-between items-center px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                className="flex flex-row flex-wrap items-center justify-between gap-4 px-4 py-4 cursor-pointer hover:bg-gray-50 transition-colors sm:px-6"
                 onClick={() => toggleCourse(index)}
               >
-                <div className="flex flex-col gap-1">
-                  <div className="flex flex-row gap-3 items-center text-black-primary font-medium">
+                <div className="flex flex-col gap-1 min-w-0">
+                  <div className="flex flex-wrap gap-3 items-center text-black-primary font-medium">
                     <h1>{item.courseName}</h1>
                     <div
                       className="py-1 px-3 text-xs font-semibold"
@@ -666,14 +663,14 @@ export default function PassingTarget() {
                           item.typeTracking === "On Track"
                             ? "1px solid rgba(115, 197, 143, 0.20)"
                             : item.typeTracking === "At Risk"
-                            ? "1px solid rgba(197, 115, 115, 0.20)"
-                            : "1px solid rgba(197, 178, 115, 0.20)",
+                              ? "1px solid rgba(197, 115, 115, 0.20)"
+                              : "1px solid rgba(197, 178, 115, 0.20)",
                         background:
                           item.typeTracking === "On Track"
                             ? "rgba(132, 224, 163, 0.20)"
                             : item.typeTracking === "At Risk"
-                            ? "rgba(224, 132, 132, 0.20)"
-                            : "rgba(224, 216, 132, 0.20)",
+                              ? "rgba(224, 132, 132, 0.20)"
+                              : "rgba(224, 216, 132, 0.20)",
                       }}
                     >
                       {item.typeTracking}
@@ -697,14 +694,14 @@ export default function PassingTarget() {
                   </div>
                 </div>
 
-                <div className="flex flex-row gap-4 items-center">
+                <div className="ml-auto flex flex-row flex-wrap items-center gap-4">
                   {item.isCalculating ? (
                     <div className="flex flex-col items-end gap-1">
                       <p className="text-xs text-gray-primary">Calculating…</p>
                       <div className="w-6 h-6 border-2 border-indigo-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                   ) : (
-                    <div className="flex flex-row gap-5 items-end">
+                    <div className="flex flex-row flex-wrap gap-5 items-end">
                       {item.thresholdResult && (
                         <div>
                           <p className="text-xs text-gray-primary text-right">Current Grade</p>
@@ -733,7 +730,7 @@ export default function PassingTarget() {
                         (async () => {
                           const maybeId = (item as any).id;
                           if (maybeId) {
-                            try { await fetch(`/api/courses?id=${maybeId}`, { method: 'DELETE' }) } catch {}
+                            try { await fetch(`/api/courses?id=${maybeId}`, { method: 'DELETE' }) } catch { }
                           }
                           setCourseItems((prev) => prev.filter((_, i) => i !== index));
                         })();
@@ -750,9 +747,8 @@ export default function PassingTarget() {
                     height="20"
                     viewBox="0 0 20 20"
                     fill="none"
-                    className={`transition-transform duration-300 ${
-                      expandedCourses.includes(index) ? "rotate-180" : ""
-                    }`}
+                    className={`transition-transform duration-300 ${expandedCourses.includes(index) ? "rotate-180" : ""
+                      }`}
                   >
                     <path
                       d="M15.8334 7.5L10.0001 12.5L4.16675 7.5"
@@ -767,7 +763,7 @@ export default function PassingTarget() {
 
               {/* Expanded Content */}
               {expandedCourses.includes(index) && (
-                <div className="flex flex-col gap-5 px-6 pt-1 pb-5">
+                <div className="flex flex-col gap-5 px-4 pt-1 pb-5 sm:px-6">
                   {/* Passing requirement banner */}
                   {item.passingRequirement && (
                     <div
@@ -811,7 +807,7 @@ export default function PassingTarget() {
                     );
                     const courseFull = courseAssessTotal >= 100;
                     return (
-                      <div className="flex flex-row justify-between items-center">
+                      <div className="flex flex-row flex-wrap items-center justify-between gap-3">
                         <h3 className="text-base text-black-primary">
                           Assessment Breakdown
                           <span className="ml-2 text-xs text-gray-primary">
@@ -844,10 +840,10 @@ export default function PassingTarget() {
                       return (
                         <div key={assessIdx} className="flex flex-col gap-5">
                           {/* Assessment row */}
-                          <div className="flex flex-row justify-between items-center">
+                          <div className="flex flex-row flex-wrap items-center justify-between gap-4">
                             <div className="flex flex-col gap-2">
                               {/* Name + weight */}
-                              <div className="flex flex-row gap-1 items-end">
+                              <div className="flex flex-wrap gap-1 items-end">
                                 <p className="font-medium text-base text-black-primary">
                                   {assessment.name}
                                 </p>
@@ -886,7 +882,7 @@ export default function PassingTarget() {
 
                             {/* Right: Add Item + date (when no sub-items) */}
                             <div className="flex flex-col items-end gap-1">
-                              <div className="flex items-center gap-3">
+                              <div className="flex flex-wrap items-center gap-3">
                                 {(() => {
                                   const itemTotal = (assessment.items ?? []).reduce(
                                     (s, it) => s + (it.weight || 0),
@@ -918,9 +914,9 @@ export default function PassingTarget() {
                                         ci !== index
                                           ? c
                                           : {
-                                              ...c,
-                                              assessments: c.assessments?.filter((_, ai) => ai !== assessIdx),
-                                            },
+                                            ...c,
+                                            assessments: c.assessments?.filter((_, ai) => ai !== assessIdx),
+                                          },
                                       );
                                       triggerCompute(index, updated);
                                       return updated;
@@ -943,10 +939,10 @@ export default function PassingTarget() {
                           {assessment.items?.map((subItem, subIdx) => (
                             <div
                               key={subIdx}
-                              className="flex flex-row justify-between items-center ml-6"
+                              className="flex flex-row flex-wrap justify-between items-center gap-4 ml-6"
                             >
                               <div className="flex flex-col gap-2">
-                                <div className="flex flex-row gap-1 items-end">
+                                <div className="flex flex-wrap gap-1 items-end">
                                   <p className="font-medium text-base text-black-primary">
                                     {subItem.name}
                                   </p>
@@ -994,16 +990,16 @@ export default function PassingTarget() {
                                         ci !== index
                                           ? c
                                           : {
-                                              ...c,
-                                              assessments: c.assessments?.map((a, ai) =>
-                                                ai !== assessIdx
-                                                  ? a
-                                                  : {
-                                                      ...a,
-                                                      items: a.items?.filter((_, si) => si !== subIdx),
-                                                    },
-                                              ),
-                                            },
+                                            ...c,
+                                            assessments: c.assessments?.map((a, ai) =>
+                                              ai !== assessIdx
+                                                ? a
+                                                : {
+                                                  ...a,
+                                                  items: a.items?.filter((_, si) => si !== subIdx),
+                                                },
+                                            ),
+                                          },
                                       );
                                       triggerCompute(index, updated);
                                       return updated;

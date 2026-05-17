@@ -47,7 +47,7 @@ export default function AssessmentForm({
       className="fixed inset-0 flex justify-center items-center z-50"
       style={{ background: "rgba(0, 0, 0, 0.64)" }}
     >
-      <div className="bg-white rounded-2xl shadow-lg w-127.75 relative">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg relative mx-4 max-h-[90vh] overflow-y-auto">
         {/* Close button */}
         <button
           onClick={onCancel}
