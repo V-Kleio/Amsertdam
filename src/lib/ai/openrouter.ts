@@ -14,12 +14,18 @@ export const FREE_MODEL_CHAIN = [
     // Benchmarks: qwen3-next ~6s ok, gemma-4 ~7s ok, gpt-oss-120b ok but slow
     // (reasoning), nemotron-super ~15s ok. glm-4.5-air (46s) and llama-3.2-3b
     // (too weak) were dropped; llama-3.3-70b kept last (frequently 429/empty).
-    "qwen/qwen3-next-80b-a3b-instruct:free",
-    "google/gemma-4-31b-it:free",
-    "google/gemma-4-26b-a4b-it:free",
+    // Order from a live benchmark on the quiz task (valid JSON + latency +
+    // availability). Lead with the models that answer reliably AND fast; every
+    // model that responds produces good JSON, so availability/speed is what
+    // matters. gpt-oss + gemma-4-31b were consistently up at ~1-1.6s; qwen and
+    // gemma-4-26b were frequently 429 (provider-throttled); nemotron works but
+    // is slow (~10s); llama-3.3 is the flakiest (429 / empty), kept last.
     "openai/gpt-oss-120b:free",
-    "nvidia/nemotron-3-super-120b-a12b:free",
+    "google/gemma-4-31b-it:free",
     "openai/gpt-oss-20b:free",
+    "qwen/qwen3-next-80b-a3b-instruct:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
     "meta-llama/llama-3.3-70b-instruct:free",
 ] as const;
 
@@ -43,13 +49,14 @@ export type Tier = "free" | "premium";
 export type ModelOption = { id: string; label: string; tier: Tier };
 
 export const MODEL_OPTIONS: ModelOption[] = [
-    // First entry is the UI default. Lead with the fastest, most reliable free
-    // JSON producer (measured) so the default pick actually succeeds.
-    { id: "qwen/qwen3-next-80b-a3b-instruct:free", label: "Qwen3 Next 80B", tier: "free" },
-    { id: "google/gemma-4-31b-it:free", label: "Gemma 4 31B", tier: "free" },
+    // First entry is the UI default. Benchmarked: gpt-oss-120b answers reliably
+    // at ~1.5s with perfect JSON, while qwen was frequently provider-throttled
+    // (429), so it leads now and qwen drops down the list.
     { id: "openai/gpt-oss-120b:free", label: "GPT-OSS 120B", tier: "free" },
-    { id: "nvidia/nemotron-3-super-120b-a12b:free", label: "Nemotron 3 Super 120B", tier: "free" },
+    { id: "google/gemma-4-31b-it:free", label: "Gemma 4 31B", tier: "free" },
     { id: "openai/gpt-oss-20b:free", label: "GPT-OSS 20B", tier: "free" },
+    { id: "qwen/qwen3-next-80b-a3b-instruct:free", label: "Qwen3 Next 80B", tier: "free" },
+    { id: "nvidia/nemotron-3-super-120b-a12b:free", label: "Nemotron 3 Super 120B", tier: "free" },
     { id: "anthropic/claude-opus-4-7", label: "Claude Opus 4.7", tier: "premium" },
 ];
 
