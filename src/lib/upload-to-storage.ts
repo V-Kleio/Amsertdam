@@ -53,3 +53,31 @@ export async function uploadToStorage(
 
   return { bucket, path, name: file.name, type: file.type, size: file.size };
 }
+
+// Files at or below this go straight through the API as multipart, the simple,
+// reliable path that needs no Storage at all. Vercel caps a function body at
+// ~4.5 MB, so we stay safely under that and only route LARGER files through
+// Storage (which bypasses the cap but adds a dependency that can fail).
+const DIRECT_UPLOAD_LIMIT = 4 * 1024 * 1024;
+
+/**
+ * Attach a source file to a generate/OCR request. Small files are appended
+ * directly (no Storage round-trip, so generation keeps working even if Storage
+ * is misconfigured); only files too large for the Vercel body cap are uploaded
+ * to Storage first and passed by reference. The API routes accept either shape.
+ */
+export async function appendSourceFile(
+  fd: FormData,
+  file: File,
+  purpose: UploadPurpose,
+): Promise<void> {
+  if (file.size <= DIRECT_UPLOAD_LIMIT) {
+    fd.append("file", file);
+    return;
+  }
+  const up = await uploadToStorage(file, purpose);
+  fd.append("bucket", up.bucket);
+  fd.append("path", up.path);
+  fd.append("fileName", up.name);
+  fd.append("fileType", up.type);
+}

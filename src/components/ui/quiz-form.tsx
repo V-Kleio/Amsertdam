@@ -10,7 +10,7 @@ import { modelTier } from "@/lib/ai/openrouter";
 import { useAiAnalyze } from "@/lib/use-ai-analyze";
 import { extractTesseractRegions } from "@/lib/tesseract-regions";
 import type { ImageOcrRegion } from "@/store/use-store";
-import { uploadToStorage } from "@/lib/upload-to-storage";
+import { appendSourceFile } from "@/lib/upload-to-storage";
 
 export type GeneratedQuestion = {
   id: string;
@@ -90,15 +90,6 @@ export default function CreateQuizModal({
   const isImageFile = (f: File) =>
     f.type.startsWith("image/") || /\.(png|jpe?g|webp|gif|bmp)$/i.test(f.name);
 
-  // Upload straight to Supabase Storage (via a server-signed URL) so the file
-  // never passes through the Vercel function and its ~4.5 MB body cap. The
-  // signed-URL flow also self-provisions the bucket and needs no storage RLS
-  // policy, so it works without any manual Supabase setup.
-  const uploadTransientFile = async (f: File) => {
-    const up = await uploadToStorage(f, "quiz");
-    return { bucket: up.bucket, path: up.path, fileName: up.name, fileType: up.type };
-  };
-
   const analyzeFile = async (file: File, title: string, course: string) => {
     // Skip the text-estimate analyze pass for images. The route returns a
     // fixed maxQuestions for image input (no source text to count terms in)
@@ -110,12 +101,8 @@ export default function CreateQuizModal({
     }
     setAnalyzing(true);
     try {
-      const up = await uploadTransientFile(file);
       const fd = new FormData();
-      fd.append("bucket", up.bucket);
-      fd.append("path", up.path);
-      fd.append("fileName", up.fileName);
-      fd.append("fileType", up.fileType);
+      await appendSourceFile(fd, file, "quiz");
       fd.append("title", title || "Untitled Quiz");
       fd.append("course", course);
       fd.append("mode", "analyze");
@@ -167,12 +154,8 @@ export default function CreateQuizModal({
     setLoading(true);
     const t = toast.loading("Generating quiz questions…");
     try {
-      const up = await uploadTransientFile(formData.file);
       const fd = new FormData();
-      fd.append("bucket", up.bucket);
-      fd.append("path", up.path);
-      fd.append("fileName", up.fileName);
-      fd.append("fileType", up.fileType);
+      await appendSourceFile(fd, formData.file, "quiz");
       fd.append("title", formData.title);
       fd.append("course", formData.course);
       fd.append("requestedQuestions", String(parsedTotal));
