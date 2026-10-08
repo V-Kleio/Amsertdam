@@ -14,11 +14,14 @@ export const FREE_MODEL_CHAIN = [
     // Benchmarks: qwen3-next ~6s ok, gemma-4 ~7s ok, gpt-oss-120b ok but slow
     // (reasoning), nemotron-super ~15s ok. glm-4.5-air (46s) and llama-3.2-3b
     // (too weak) were dropped; llama-3.3-70b kept last (frequently 429/empty).
+    // dots-3-note-preview and nemotron-3-ultra (550B, ~51% 1-day uptime) are
+    // slow reasoning models: as the DEFAULT they hung until the route deadline
+    // and every PDF quiz fell back to "basic". Kept last, as fallbacks only.
+    "google/gemma-4-31b-it:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
     "dots-studio/dots-3-note-preview:free",
     "nvidia/nemotron-3-ultra-550b-a55b:free",
-    "google/gemma-4-31b-it:free",
-    "nvidia/nemotron-3-super-120b-a12b:free",
-    "google/gemma-4-26b-a4b-it:free",
 ] as const;
 
 // Premium chain — paid Claude models. Reliable (no free-tier rate limits),
@@ -43,10 +46,11 @@ export type ModelOption = { id: string; label: string; tier: Tier };
 export const MODEL_OPTIONS: ModelOption[] = [
     // First entry is the UI default. Lead with the fastest, most reliable free
     // JSON producer (measured) so the default pick actually succeeds.
-    { id: "dots-studio/dots-3-note-preview:free", label: "Dots 3 Note Preview", tier: "free" },
-    { id: "nvidia/nemotron-3-ultra-550b-a55b:free", label: "Nemotron 3 Ultra 550B", tier: "free" },
     { id: "google/gemma-4-31b-it:free", label: "Gemma 4 31B", tier: "free" },
+    { id: "google/gemma-4-26b-a4b-it:free", label: "Gemma 4 26B", tier: "free" },
     { id: "nvidia/nemotron-3-super-120b-a12b:free", label: "Nemotron 3 Super 120B", tier: "free" },
+    { id: "dots-studio/dots-3-note-preview:free", label: "Dots 3 Note Preview (slow)", tier: "free" },
+    { id: "nvidia/nemotron-3-ultra-550b-a55b:free", label: "Nemotron 3 Ultra 550B (slow)", tier: "free" },
     { id: "anthropic/claude-opus-4-7", label: "Claude Opus 4.7", tier: "premium" },
 ];
 
@@ -298,7 +302,13 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export async function chatWithFallback(
     messages: ChatMessage[],
     chainOrTier: readonly string[] | Tier = "free",
-    opts: { deadlineMs?: number; maxTokens?: number; skip?: Set<string> } = {},
+    opts: {
+        deadlineMs?: number;
+        maxTokens?: number;
+        skip?: Set<string>;
+        /** Max time ONE model gets before we abandon it for the next. */
+        perModelTimeoutMs?: number;
+    } = {},
 ): Promise<OpenRouterResult> {
     // Output token cap. Default 500 keeps the analyze route cheap. Pass
     // `maxTokens: 0` for "uncapped" — we send a generous bound (16000) rather
@@ -349,6 +359,12 @@ export async function chatWithFallback(
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), DEADLINE_MS);
 
+    // Per-model cap. Without it, one slow/hung free model (big reasoning
+    // models can take a minute+) silently eats the WHOLE budget, the deadline
+    // aborts it, and the caller drops to the basic extractor without ever
+    // trying the faster models further down the chain.
+    const PER_MODEL_MS = opts.perModelTimeoutMs ?? 25_000;
+
     // Backoff between full passes (with light jitter).
     const PASS_BACKOFF_MS = [500, 1200, 2500];
     const MAX_PASSES = PASS_BACKOFF_MS.length + 1;
@@ -362,8 +378,16 @@ export async function chatWithFallback(
                 if (Date.now() - startedAt > DEADLINE_MS) {
                     throw new AllModelsFailedError(lastStatus || 503);
                 }
+                const budgetLeft = DEADLINE_MS - (Date.now() - startedAt);
+                const modelTimeout = AbortSignal.timeout(Math.min(PER_MODEL_MS, budgetLeft));
+                const attemptStartedAt = Date.now();
                 try {
-                    const r = await callModel(model, messages, controller.signal, maxTokens);
+                    const r = await callModel(
+                        model,
+                        messages,
+                        AbortSignal.any([controller.signal, modelTimeout]),
+                        maxTokens,
+                    );
                     if (r.ok) return r.result;
                     lastStatus = r.status;
                     // A 429 means this model is throttled for a while — don't
@@ -376,9 +400,18 @@ export async function chatWithFallback(
                         sawRetryable = true;
                     }
                     // non-retryable (400/401/403/404): move to next model.
-                } catch {
+                } catch (err) {
                     lastStatus = 503; // network / abort
-                    sawRetryable = true;
+                    const elapsed = Date.now() - attemptStartedAt;
+                    if (modelTimeout.aborted) {
+                        // Too slow right now — don't spend more of this
+                        // request (or later chunks) waiting on it again.
+                        console.error(`[openrouter] ${model} → timed out after ${elapsed}ms`);
+                        skip.add(model);
+                    } else {
+                        console.error(`[openrouter] ${model} → ${err instanceof Error ? err.message : err} after ${elapsed}ms`);
+                        sawRetryable = true;
+                    }
                 }
             }
             // If nothing in the chain was worth retrying (e.g. all hard 400s

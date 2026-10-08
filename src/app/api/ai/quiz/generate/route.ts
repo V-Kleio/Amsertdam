@@ -320,9 +320,10 @@ export async function POST(req: NextRequest) {
         maxTokens: 0,
         skip: llmSkip,
       });
-      console.log("LLM response:", resp);
       const parsed = normalizeOpenRouterQuiz(resp.content);
-      console.log("LLM parsed:", parsed);
+      console.log(
+        `[quiz] ${resp.model} → ${parsed?.questions?.length ?? 0} questions parsed from ${resp.content.length} chars`,
+      );
       if (!parsed || !parsed.questions?.length) return [];
       const polished = polishQuizPayload(parsed).map((q, idx) => ({
         id: `llm_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 6)}`,
@@ -330,8 +331,10 @@ export async function POST(req: NextRequest) {
         options: q.options,
         correctAnswer: q.correctAnswer,
       })) as QuizQuestion[];
-      if (!polished.length || !validateQuizPayload({ questions: polished }))
+      if (!polished.length || !validateQuizPayload({ questions: polished })) {
+        console.error(`[quiz] ${resp.model} → output failed validation after polish`);
         return [];
+      }
       return polished;
     };
 
@@ -384,42 +387,62 @@ export async function POST(req: NextRequest) {
           }
         }
       } else {
+        // Generate in SMALL batches, several IN PARALLEL, each on a different
+        // slice of the source. One call asking a free model for 25 questions
+        // (~3.5k output tokens) routinely ran past the route deadline, got
+        // aborted, and the whole quiz silently dropped to the basic extractor.
+        // Concurrent ~6-question calls finish in a fraction of the time, and
+        // different slices keep the batches from duplicating each other.
+        const BATCH_SIZE = 6;
+        const CONCURRENCY = 3;
+        const MAX_ROUNDS = 4;
         const CHUNK_SIZE = Number(process.env.AI_CHUNK_SIZE || 4000);
         const CHUNK_OVERLAP = Number(process.env.AI_CHUNK_OVERLAP || 200);
-        const threshold = CHUNK_SIZE * 1;
-        const chunks =
-          cleaned.length > threshold
-            ? splitTextIntoChunks(cleaned, CHUNK_SIZE, CHUNK_OVERLAP)
-            : [cleaned];
-        const MAX_ATTEMPTS = chunks.length + 4;
-        for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-          if (collected.length >= target) break;
+        const chunkSize = Math.min(
+          CHUNK_SIZE,
+          Math.max(1500, Math.ceil(cleaned.length / CONCURRENCY)),
+        );
+        const chunks = splitTextIntoChunks(cleaned, chunkSize, CHUNK_OVERLAP);
+        if (!chunks.length) chunks.push(cleaned);
+        let cursor = 0;
+        for (let round = 0; round < MAX_ROUNDS; round++) {
+          const need = target - collected.length;
+          if (need <= 0) break;
           if (remainingBudget() < MIN_CALL_MS) break;
-          const chunk = chunks[attempt % chunks.length];
-          const want = overAsk(target - collected.length);
+          const calls = Math.min(CONCURRENCY, Math.ceil(need / BATCH_SIZE));
+          const want = Math.min(maxQuestions, Math.ceil(need / calls) + 2);
           const system = buildSystemPrompt(want, language);
-          const user =
-            `Source text:\n${chunk}\n\nProduce ${want} multiple-choice questions.` +
-            avoidClause();
-          try {
-            pushUnique(
-              await runCall([
+          const avoid = avoidClause();
+          const results = await Promise.allSettled(
+            Array.from({ length: calls }, () => {
+              const chunk = chunks[cursor++ % chunks.length];
+              return runCall([
                 { role: "system", content: system },
-                { role: "user", content: user },
-              ]),
-            );
-          } catch (err) {
-            if (isPremium && err instanceof AllModelsFailedError) {
-              if (reservedCredits > 0) {
-                await refundCredit(userId, reservedCredits);
-                reservedCredits = 0;
-              }
-              return NextResponse.json(
-                { error: err.message, credits: await getCredits(userId) },
-                { status: 503 },
-              );
-            }
+                {
+                  role: "user",
+                  content: `Source text:\n${chunk}\n\nProduce ${want} multiple-choice questions.${avoid}`,
+                },
+              ]);
+            }),
+          );
+          let failure: AllModelsFailedError | null = null;
+          for (const r of results) {
+            if (r.status === "fulfilled") pushUnique(r.value);
+            else if (r.reason instanceof AllModelsFailedError) failure = r.reason;
           }
+          if (isPremium && failure && collected.length === 0) {
+            if (reservedCredits > 0) {
+              await refundCredit(userId, reservedCredits);
+              reservedCredits = 0;
+            }
+            return NextResponse.json(
+              { error: failure.message, credits: await getCredits(userId) },
+              { status: 503 },
+            );
+          }
+          // Every call failed even after the model chain's own retries —
+          // another round would only hit the same wall.
+          if (results.every((r) => r.status === "rejected")) break;
         }
       }
     } catch {

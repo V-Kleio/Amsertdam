@@ -1,14 +1,46 @@
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 
-export const redis = Redis.fromEnv();
+/**
+ * Accept the common ways the Upstash URL gets pasted: with stray quotes or
+ * whitespace, without a scheme ("xyz.upstash.io"), or as the TCP connection
+ * string ("rediss://default:<pw>@xyz.upstash.io:6379"). The REST client only
+ * understands "https://<host>", so normalize to that.
+ */
+function normalizeRestUrl(raw: string | undefined): string | undefined {
+    const v = raw?.trim().replace(/^["']|["']$/g, "");
+    if (!v) return undefined;
+    const tcp = v.match(/^rediss?:\/\/(?:[^@]*@)?([^:/]+)/);
+    if (tcp) return `https://${tcp[1]}`;
+    return /^https?:\/\//.test(v) ? v : `https://${v}`;
+}
+
+// Created lazily, on first use, NOT at module load: a missing or malformed
+// env var must surface as a handled runtime error (QuotaUnavailableError /
+// cache miss), never crash `next build` while it collects page data.
+let redisClient: Redis | null = null;
+export function getRedis(): Redis {
+    if (!redisClient) {
+        const url = normalizeRestUrl(process.env.UPSTASH_REDIS_REST_URL);
+        const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim().replace(/^["']|["']$/g, "");
+        if (!url || !token) {
+            throw new Error("UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN are not set");
+        }
+        redisClient = new Redis({ url, token });
+    }
+    return redisClient;
+}
 
 // Spam guard: max 5 requests / 10s per identifier (user or IP).
-export const burstLimiter = new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(5, "10 s"),
-    prefix: "rl:burst",
-});
+let burstLimiterInstance: Ratelimit | null = null;
+function getBurstLimiter(): Ratelimit {
+    burstLimiterInstance ??= new Ratelimit({
+        redis: getRedis(),
+        limiter: Ratelimit.slidingWindow(5, "10 s"),
+        prefix: "rl:burst",
+    });
+    return burstLimiterInstance;
+}
 
 export const DAILY_QUOTA = 20;
 
@@ -58,7 +90,7 @@ function quotaKey(userId: string): string {
 
 export async function peekQuota(userId: string): Promise<number> {
     return guard(async () => {
-        const used = (await redis.get<number>(quotaKey(userId))) ?? 0;
+        const used = (await getRedis().get<number>(quotaKey(userId))) ?? 0;
         return Math.max(0, DAILY_QUOTA - used);
     });
 }
@@ -74,7 +106,7 @@ export async function peekQuotaOrNull(userId: string): Promise<number | null> {
  */
 export async function burstAllowed(ids: string[]): Promise<boolean> {
     try {
-        const results = await Promise.all(ids.map((id) => burstLimiter.limit(id)));
+        const results = await Promise.all(ids.map((id) => getBurstLimiter().limit(id)));
         return results.every((r) => r.success);
     } catch (err) {
         console.error("[limits] burst limiter unavailable, failing open:", err);
@@ -86,10 +118,10 @@ export async function burstAllowed(ids: string[]): Promise<boolean> {
 export async function consumeQuota(userId: string): Promise<number | null> {
     return guard(async () => {
         const key = quotaKey(userId);
-        const used = await redis.incr(key);
-        if (used === 1) await redis.expire(key, secondsUntilUtcMidnight());
+        const used = await getRedis().incr(key);
+        if (used === 1) await getRedis().expire(key, secondsUntilUtcMidnight());
         if (used > DAILY_QUOTA) {
-            await redis.decr(key);       // roll back the over-count
+            await getRedis().decr(key);       // roll back the over-count
             return null;
         }
         return DAILY_QUOTA - used;
@@ -98,7 +130,7 @@ export async function consumeQuota(userId: string): Promise<number | null> {
 
 /** Give the unit back if the AI call failed — don't burn quota on errors. */
 export async function refundQuota(userId: string): Promise<void> {
-    await bestEffort(() => redis.decr(quotaKey(userId)));
+    await bestEffort(() => getRedis().decr(quotaKey(userId)));
 }
 
 /**
@@ -110,11 +142,11 @@ export async function consumeQuotaN(userId: string, n: number): Promise<number> 
     if (n <= 0) return 0;
     return guard(async () => {
         const key = quotaKey(userId);
-        const used = await redis.incrby(key, n);
-        await redis.expire(key, secondsUntilUtcMidnight());
+        const used = await getRedis().incrby(key, n);
+        await getRedis().expire(key, secondsUntilUtcMidnight());
         if (used > DAILY_QUOTA) {
             const rollback = Math.min(n, used - DAILY_QUOTA);
-            if (rollback > 0) await redis.decrby(key, rollback);
+            if (rollback > 0) await getRedis().decrby(key, rollback);
             return n - rollback;
         }
         return n;
@@ -123,5 +155,5 @@ export async function consumeQuotaN(userId: string, n: number): Promise<number> 
 
 /** Refund `n` units (e.g. items reserved up front but never produced). */
 export async function refundQuotaN(userId: string, n: number): Promise<void> {
-    if (n > 0) await bestEffort(() => redis.decrby(quotaKey(userId), n));
+    if (n > 0) await bestEffort(() => getRedis().decrby(quotaKey(userId), n));
 }

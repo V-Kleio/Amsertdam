@@ -1,5 +1,5 @@
 import { createHash } from "crypto";
-import { redis } from "./limits";
+import { getRedis } from "./limits";
 import type { AnalysisResult } from "./prompt";
 
 // Per-user Upstash cache for analyze results. Keys must always include the
@@ -23,7 +23,7 @@ export function cacheKey(subject: string, question: string, answer: string): str
 export async function getCached(key: string): Promise<AnalysisResult | null> {
     // Cache is an optimization — a Redis outage must not fail the request.
     try {
-        return (await redis.get<AnalysisResult>(key)) ?? null;
+        return (await getRedis().get<AnalysisResult>(key)) ?? null;
     } catch (err) {
         console.error("[cache] get failed:", err);
         return null;
@@ -32,7 +32,7 @@ export async function getCached(key: string): Promise<AnalysisResult | null> {
 
 export async function setCached(key: string, value: AnalysisResult): Promise<void> {
     try {
-        await redis.set(key, value, { ex: TTL_SECONDS });
+        await getRedis().set(key, value, { ex: TTL_SECONDS });
     } catch (err) {
         console.error("[cache] set failed:", err);
     }
