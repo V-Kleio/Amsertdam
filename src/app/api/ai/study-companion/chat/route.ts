@@ -8,7 +8,7 @@ import {
 } from "@/lib/ai/openrouter";
 import { streamClaude } from "@/lib/anthropic";
 import { spendCredit, refundCredit } from "@/lib/ai/credits";
-import { consumeQuota, refundQuota } from "@/lib/ai/limits";
+import { consumeQuota, refundQuota, QuotaUnavailableError } from "@/lib/ai/limits";
 import { requireUserId } from "@/lib/get-user-id";
 
 export const runtime = "nodejs";
@@ -347,7 +347,16 @@ export async function POST(req: NextRequest) {
       );
     }
   } else {
-    const left = await consumeQuota(auth.userId);
+    let left: number | null;
+    try {
+      left = await consumeQuota(auth.userId);
+    } catch (err) {
+      if (!(err instanceof QuotaUnavailableError)) throw err;
+      return new Response(JSON.stringify({ error: err.message }), {
+        status: 503,
+        headers: { "content-type": "application/json" },
+      });
+    }
     if (left === null) {
       return new Response(
         JSON.stringify({

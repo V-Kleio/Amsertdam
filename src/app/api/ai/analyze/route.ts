@@ -9,7 +9,13 @@ import {
     resolveChain,
     type Tier,
 } from "@/lib/ai/openrouter";
-import { burstLimiter, consumeQuota, refundQuota, peekQuota } from "@/lib/ai/limits";
+import {
+    burstAllowed,
+    consumeQuota,
+    refundQuota,
+    peekQuotaOrNull,
+    QuotaUnavailableError,
+} from "@/lib/ai/limits";
 import { getCredits, spendCredit, refundCredit } from "@/lib/ai/credits";
 import { cacheKey, getCached, setCached } from "@/lib/ai/cache";
 import { SYSTEM_PROMPT, buildUserMessage, parseAnalysis } from "@/lib/ai/prompt";
@@ -31,11 +37,7 @@ export async function POST(req: Request) {
         req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
         req.headers.get("x-real-ip") ||
         "unknown";
-    const [userBurst, ipBurst] = await Promise.all([
-        burstLimiter.limit(`u:${userId}`),
-        burstLimiter.limit(`ip:${ip}`),
-    ]);
-    if (!userBurst.success || !ipBurst.success) {
+    if (!(await burstAllowed([`u:${userId}`, `ip:${ip}`]))) {
         return NextResponse.json(
             { error: "You're going too fast. Wait a few seconds and try again." },
             { status: 429 },
@@ -86,7 +88,7 @@ export async function POST(req: Request) {
             analysis: cached,
             cached: true,
             tier,
-            remaining: await peekQuota(userId),
+            remaining: await peekQuotaOrNull(userId),
             credits: await getCredits(userId),
         });
     }
@@ -94,7 +96,7 @@ export async function POST(req: Request) {
     // 4. Spend the right "currency": a durable credit for premium, the
     //    daily quota for free.
     let spentCredit = false;
-    let remaining = await peekQuota(userId);
+    let remaining = await peekQuotaOrNull(userId);
     let credits = await getCredits(userId);
 
     if (tier === "premium") {
@@ -113,7 +115,13 @@ export async function POST(req: Request) {
         spentCredit = true;
         credits = newBalance;
     } else {
-        const left = await consumeQuota(userId);
+        let left: number | null;
+        try {
+            left = await consumeQuota(userId);
+        } catch (err) {
+            if (!(err instanceof QuotaUnavailableError)) throw err;
+            return NextResponse.json({ error: err.message, credits }, { status: 503 });
+        }
         if (left === null) {
             return NextResponse.json(
                 {
@@ -182,7 +190,7 @@ export async function POST(req: Request) {
     } catch (err) {
         await refund();
         const credBack = spentCredit ? credits + PREMIUM_CREDIT_COST : credits;
-        const quotaBack = spentCredit ? remaining : remaining + 1;
+        const quotaBack = spentCredit || remaining === null ? remaining : remaining + 1;
         if (err instanceof AllModelsFailedError) {
             // For free-tier failures, nudge toward premium (which doesn't
             // share the flaky free rate limits).
@@ -206,9 +214,14 @@ export async function POST(req: Request) {
 export async function GET() {
     const auth = await requireUserId();
     if (auth.response) return auth.response;
+    // Credits live in Supabase and the free quota in Redis — fetch them
+    // independently so one store being down doesn't hide the other.
     const [remaining, credits] = await Promise.all([
-        peekQuota(auth.userId),
-        getCredits(auth.userId),
+        peekQuotaOrNull(auth.userId),
+        getCredits(auth.userId).catch((err) => {
+            console.error("[analyze] getCredits failed:", err);
+            return null;
+        }),
     ]);
     return NextResponse.json({ remaining, credits });
 }

@@ -21,9 +21,19 @@ export function cacheKey(subject: string, question: string, answer: string): str
 }
 
 export async function getCached(key: string): Promise<AnalysisResult | null> {
-    return (await redis.get<AnalysisResult>(key)) ?? null;
+    // Cache is an optimization — a Redis outage must not fail the request.
+    try {
+        return (await redis.get<AnalysisResult>(key)) ?? null;
+    } catch (err) {
+        console.error("[cache] get failed:", err);
+        return null;
+    }
 }
 
 export async function setCached(key: string, value: AnalysisResult): Promise<void> {
-    await redis.set(key, value, { ex: TTL_SECONDS });
+    try {
+        await redis.set(key, value, { ex: TTL_SECONDS });
+    } catch (err) {
+        console.error("[cache] set failed:", err);
+    }
 }

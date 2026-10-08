@@ -15,7 +15,7 @@ import {
   type Tier,
 } from "@/lib/ai/openrouter";
 import { spendCredit, refundCredit, getCredits } from "@/lib/ai/credits";
-import { peekQuota, consumeQuotaN, refundQuotaN } from "@/lib/ai/limits";
+import { peekQuota, consumeQuotaN, refundQuotaN, QuotaUnavailableError } from "@/lib/ai/limits";
 import { normalizeOpenRouterFlashcards } from "@/lib/ai/normalizers";
 import { validateFlashcardPayload } from "@/lib/ai/validator";
 import { splitTextIntoChunks } from "@/lib/ai/splitter";
@@ -446,6 +446,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const status = err instanceof QuotaUnavailableError ? 503 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }
