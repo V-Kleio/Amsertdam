@@ -14,13 +14,8 @@ export const FREE_MODEL_CHAIN = [
     // Benchmarks: qwen3-next ~6s ok, gemma-4 ~7s ok, gpt-oss-120b ok but slow
     // (reasoning), nemotron-super ~15s ok. glm-4.5-air (46s) and llama-3.2-3b
     // (too weak) were dropped; llama-3.3-70b kept last (frequently 429/empty).
-    "qwen/qwen3-next-80b-a3b-instruct:free",
-    "google/gemma-4-31b-it:free",
-    "google/gemma-4-26b-a4b-it:free",
-    "openai/gpt-oss-120b:free",
-    "nvidia/nemotron-3-super-120b-a12b:free",
-    "openai/gpt-oss-20b:free",
-    "meta-llama/llama-3.3-70b-instruct:free",
+    "dots-studio/dots-3-note-preview:free",
+    "nemotron-3-ultra-550b-a55b:free",
 ] as const;
 
 // Premium chain — paid Claude models. Reliable (no free-tier rate limits),
@@ -45,11 +40,8 @@ export type ModelOption = { id: string; label: string; tier: Tier };
 export const MODEL_OPTIONS: ModelOption[] = [
     // First entry is the UI default. Lead with the fastest, most reliable free
     // JSON producer (measured) so the default pick actually succeeds.
-    { id: "qwen/qwen3-next-80b-a3b-instruct:free", label: "Qwen3 Next 80B", tier: "free" },
-    { id: "google/gemma-4-31b-it:free", label: "Gemma 4 31B", tier: "free" },
-    { id: "openai/gpt-oss-120b:free", label: "GPT-OSS 120B", tier: "free" },
-    { id: "nvidia/nemotron-3-super-120b-a12b:free", label: "Nemotron 3 Super 120B", tier: "free" },
-    { id: "openai/gpt-oss-20b:free", label: "GPT-OSS 20B", tier: "free" },
+    { id: "dots-studio/dots-3-note-preview:free", label: "Dots 3 Note Preview", tier: "free" },
+    { id: "nemotron-3-ultra-550b-a55b:free", label: "Nemotron 3 Ultra Free", tier: "free" },
     { id: "anthropic/claude-opus-4-7", label: "Claude Opus 4.7", tier: "premium" },
 ];
 
