@@ -6,7 +6,7 @@ import { requireUserId } from "@/lib/get-user-id";
 interface Assessment {
   name: string;
   weight: number;
-  score?: number;
+  score?: number; 
 }
 
 interface Requirement {
