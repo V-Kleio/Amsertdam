@@ -2,6 +2,7 @@
 @config "../../tailwind.config.ts";
 @import "tw-animate-css";
 @import "shepherd.js/dist/css/shepherd.css";
+@import "katex/dist/katex.min.css";
 
 @custom-variant dark (&:is(.dark *));
 

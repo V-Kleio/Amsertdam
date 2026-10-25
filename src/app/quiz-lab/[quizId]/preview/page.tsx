@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Download, Play } from "lucide-react";
 import toast from "react-hot-toast";
 import { useQuizById } from "@/lib/quiz-data";
+import LatexText from "@/components/ui/latex-text";
 
 export default function QuizPreview({
   params,
@@ -64,7 +65,7 @@ export default function QuizPreview({
             className="rounded-xl border border-gray-200 bg-white p-6"
           >
             <h2 className="text-base font-semibold text-black-primary mb-4">
-              {idx + 1}. {q.prompt}
+              {idx + 1}. <LatexText>{q.prompt}</LatexText>
             </h2>
             <ul className="flex flex-col gap-2 pl-2">
               {q.options.map((opt) => (
@@ -75,7 +76,7 @@ export default function QuizPreview({
                   <span className="font-medium text-black-primary">
                     {opt.letter}.
                   </span>{" "}
-                  {opt.text}
+                  <LatexText>{opt.text}</LatexText>
                 </li>
               ))}
             </ul>

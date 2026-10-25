@@ -6,6 +6,7 @@ import { useSearchParams, notFound } from "next/navigation";
 import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 import { useQuizById } from "@/lib/quiz-data";
 import { useStore } from "@/store/use-store";
+import LatexText from "@/components/ui/latex-text";
 
 type Answer = "A" | "B" | "C" | "D";
 
@@ -128,17 +129,22 @@ export default function QuizResult({
                 )}
                 <div className="flex-1">
                   <h3 className="text-base font-medium text-black-primary mb-2">
-                    {idx + 1}. {q.prompt}
+                    {idx + 1}. <LatexText>{q.prompt}</LatexText>
                   </h3>
                   <p className="text-sm text-gray-primary">
                     Your answer:{" "}
-                    {userOption
-                      ? `${userOption.letter}. ${userOption.text}`
-                      : "-"}
+                    {userOption ? (
+                      <>
+                        {userOption.letter}. <LatexText>{userOption.text}</LatexText>
+                      </>
+                    ) : (
+                      "-"
+                    )}
                   </p>
                   {!isCorrect && correctOption && (
                     <p className="text-sm text-green-700 mt-1">
-                      Correct: {correctOption.letter}. {correctOption.text}
+                      Correct: {correctOption.letter}.{" "}
+                      <LatexText>{correctOption.text}</LatexText>
                     </p>
                   )}
                 </div>

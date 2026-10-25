@@ -6,6 +6,7 @@ import { useRouter, notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useQuizById } from "@/lib/quiz-data";
 import type { ImageOcrRegion } from "@/store/use-store";
+import LatexText from "@/components/ui/latex-text";
 
 /** Quiz reference image with its labels covered so answers aren't readable.
  *  Tap a box to peek. */
@@ -142,7 +143,7 @@ export default function TakeQuiz({
 
           <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="text-lg font-medium text-black-primary mb-6">
-              {question.prompt}
+              <LatexText>{question.prompt}</LatexText>
             </h2>
             <div className="flex flex-col gap-3">
               {question.options.map((opt) => {
@@ -168,7 +169,7 @@ export default function TakeQuiz({
                       {opt.letter}
                     </span>
                     <span className="text-base text-black-primary">
-                      {opt.text}
+                      <LatexText>{opt.text}</LatexText>
                     </span>
                   </button>
                 );

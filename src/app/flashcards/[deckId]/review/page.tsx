@@ -5,6 +5,7 @@ import Link from "next/link";
 import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useStore, type ImageOcrRegion } from "@/store/use-store";
+import LatexText from "@/components/ui/latex-text";
 
 const COVER_COLORS = [
   "rgb(99, 102, 241)",   // 1  indigo
@@ -691,7 +692,7 @@ export default function FlashcardReview({
         <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-12 mb-8 min-h-70 flex flex-col justify-center">
           {/* Question */}
           <p className="text-lg text-black-primary text-center mb-8">
-            {currentCard.question}
+            <LatexText>{currentCard.question}</LatexText>
           </p>
 
           {/* Answer Section */}
@@ -700,7 +701,11 @@ export default function FlashcardReview({
             onClick={() => { if (!showAnswer) markStudied(currentCardIndex); setShowAnswer(!showAnswer); }}
           >
             <p className="text-center text-2xl font-mono tracking-wider text-black-primary">
-              {showAnswer ? currentCard.answer : formatAnswerBlanks(currentCard.answer)}
+              {showAnswer ? (
+                <LatexText>{currentCard.answer}</LatexText>
+              ) : (
+                formatAnswerBlanks(currentCard.answer)
+              )}
             </p>
           </div>
 
@@ -716,7 +721,7 @@ export default function FlashcardReview({
               </button>
               {showHint && (
                 <p className="mt-3 text-sm text-indigo-primary italic">
-                  {currentCard.hint}
+                  <LatexText>{currentCard.hint}</LatexText>
                 </p>
               )}
             </div>
@@ -846,8 +851,12 @@ function SessionSummary({ deckTitle, studiedCards, total, onClose }: { deckTitle
           <ul className="flex flex-col gap-2">
             {studiedCards.map((c) => (
               <li key={c.id} className="rounded-lg border border-gray-100 bg-gray-50 p-3">
-                <p className="text-sm font-medium text-black-primary">{c.question}</p>
-                <p className="mt-0.5 text-sm text-indigo-primary">{c.answer}</p>
+                <p className="text-sm font-medium text-black-primary">
+                  <LatexText>{c.question}</LatexText>
+                </p>
+                <p className="mt-0.5 text-sm text-indigo-primary">
+                  <LatexText>{c.answer}</LatexText>
+                </p>
               </li>
             ))}
           </ul>

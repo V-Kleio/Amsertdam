@@ -15,6 +15,7 @@ import { useAiAnalyze, useAiUsageOnMount } from "@/lib/use-ai-analyze";
 import { MODEL_OPTIONS, modelTier } from "@/lib/ai/openrouter";
 import ModelPicker, { DEFAULT_MODEL_ID } from "@/components/ui/model-picker";
 import { useStore } from "@/store/use-store";
+import LatexText from "@/components/ui/latex-text";
 
 const DEFAULT_MODEL = DEFAULT_MODEL_ID;
 
@@ -336,7 +337,7 @@ function QuestionReviewCard({
         <div className="flex-1">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-base font-semibold text-black-primary">
-              Question {number}: {question.prompt}
+              Question {number}: <LatexText>{question.prompt}</LatexText>
             </h3>
             <div className="flex items-center gap-2 shrink-0">
               {/* Pick any model — free ones are free, Opus charges a credit. */}
@@ -362,11 +363,16 @@ function QuestionReviewCard({
             </div>
           </div>
           <p className="text-sm text-gray-primary mt-2">
-            Your answer: {question.answered ? question.yourAnswer : "Not answered"}
+            Your answer:{" "}
+            {question.answered ? (
+              <LatexText>{question.yourAnswer}</LatexText>
+            ) : (
+              "Not answered"
+            )}
           </p>
           {!question.isCorrect && (
             <p className="text-sm text-green-600 font-medium">
-              Correct: {question.correctAnswer}
+              Correct: <LatexText>{question.correctAnswer}</LatexText>
             </p>
           )}
 
